@@ -86,8 +86,3 @@ top_three = ["LAY KENNETH L", "SKILLING JEFFREY K", "FASTOW ANDREW S"]
 len([key
      for key, value in enron_data.items() if value["salary"] != "NaN"])
 # Output: 95
-
-# How many folks have known email addresses?
-len([key
-     for key, value in enron_data.items() if value["email_address"] != "NaN"])
-# Output: 111
