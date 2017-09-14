@@ -48,6 +48,7 @@ reg.fit(feature_train, target_train)
 
 # Print out the slope (first coefficient) and intercept for our fitted
 # regression model
+print "\n=== Bonus vs. Salary ==="
 print "Slope: ", reg.coef_[0]
 print "Intercept: ", reg.intercept_
 
@@ -57,6 +58,50 @@ print "Score(train): ", reg.score(feature_train, target_train)
 # Calculate score (r^2) value for the model using the test data we have been
 # saving
 print "Score(test): ", reg.score(feature_test, target_test)
+
+# Try a regression against long term incentive instead of salary to try to
+# predict bonuses
+features_list = ["bonus", "long_term_incentive"]
+data = featureFormat(dictionary, features_list, remove_any_zeroes=True)
+target, features = targetFeatureSplit(data)
+from sklearn.cross_validation import train_test_split
+feature_train, feature_test, target_train, target_test = train_test_split(
+    features, target, test_size=0.5, random_state=42
+)
+train_color = "b"
+test_color = "r"
+
+# Create the model and fit it to our data
+reg = linear_model.LinearRegression()
+reg.fit(feature_train, target_train)
+
+# Print out the slope (first coefficient) and intercept for our fitted
+# regression model
+print "\n=== Bonus vs. Long Term Incentive ==="
+print "Slope: ", reg.coef_[0]
+print "Intercept: ", reg.intercept_
+
+# Calculate score (r^2) value for the model using the same training data set
+print "Score(train): ", reg.score(feature_train, target_train)
+
+# Calculate score (r^2) value for the model using the test data we have been
+# saving
+print "Score(test): ", reg.score(feature_test, target_test)
+
+# Revert back to the salary based regression
+features_list = ["bonus", "salary"]
+data = featureFormat(dictionary, features_list, remove_any_zeroes=True)
+target, features = targetFeatureSplit(data)
+from sklearn.cross_validation import train_test_split
+feature_train, feature_test, target_train, target_test = train_test_split(
+    features, target, test_size=0.5, random_state=42
+)
+train_color = "b"
+test_color = "r"
+
+# Create the model and fit it to our data
+reg = linear_model.LinearRegression()
+reg.fit(feature_train, target_train)
 
 
 # draw the scatterplot, with color-coded training and testing points
@@ -70,11 +115,34 @@ for feature, target in zip(feature_train, target_train):
 plt.scatter(feature_test[0], target_test[0], color=test_color, label="test")
 plt.scatter(feature_test[0], target_test[0], color=train_color, label="train")
 
+
 # draw the regression line, once it's coded
 try:
     plt.plot(feature_test, reg.predict(feature_test))
 except NameError:
     pass
+
+# Code for drawing regression line for both train and test data.
+reg.fit(feature_test, target_test)
+
+# Print out the slope (first coefficient) and intercept for our fitted
+# regression model
+print "\n=== Bonus vs. Salary(no outliers)==="
+print "Slope: ", reg.coef_[0]
+print "Intercept: ", reg.intercept_
+
+# Calculate score (r^2) value for the model using the same training data set
+print "Score(train): ", reg.score(feature_train, target_train)
+
+# Calculate score (r^2) value for the model using the test data we have been
+# saving
+print "Score(test): ", reg.score(feature_test, target_test)
+
+try:
+    plt.plot(feature_train, reg.predict(feature_train), color="b")
+except NameError:
+    pass
+
 plt.xlabel(features_list[1])
 plt.ylabel(features_list[0])
 plt.legend()
