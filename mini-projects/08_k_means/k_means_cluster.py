@@ -89,10 +89,41 @@ print max(salary)
 print "salary minimum: "
 print min(salary)
 
+
+# Feature Scaling lesson #
+
+# Rebuild data with two variables for cleanliness.
+feature_1 = "salary"
+feature_2 = "exercised_stock_options"
+poi = "poi"
+features_list = [poi, feature_1, feature_2]
+data = featureFormat(data_dict, features_list)
+poi, finance_features = targetFeatureSplit(data)
+
+# Rescale the stock options and salary variables.
+from sklearn.preprocessing import MinMaxScaler
+
+scaler = MinMaxScaler()
+scaler.fit(finance_features)
+finance_features = scaler.transform(finance_features)
+
+# Checking some scaled values
+print scaler.transform([[200000, 1000000]])
+
+# Redo the calculation for clusters with the scaled parameters.
+for f1, f2 in finance_features:
+    plt.scatter(f1, f2)
+plt.show()
+
+kmeans = KMeans(n_clusters=3)
+kmeans.fit(finance_features)
+pred = kmeans.predict(finance_features)
+
 # rename the "name" parameter when you change the number of features
 # so that the figure gets saved to a different file
 try:
-    Draw(pred, finance_features, poi, mark_poi=False, name="clusters_3.pdf",
+    Draw(pred, finance_features, poi, mark_poi=False,
+         name="clusters_3_scaled.pdf",
          f1_name=feature_1,
          f2_name=feature_2)
 except NameError:
