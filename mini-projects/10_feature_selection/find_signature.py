@@ -8,11 +8,10 @@ numpy.random.seed(42)
 ### The words (features) and authors (labels), already largely processed.
 ### These files should have been created from the previous (Lesson 10)
 ### mini-project.
-words_file = "../text_learning/your_word_data.pkl" 
-authors_file = "../text_learning/your_email_authors.pkl"
+words_file = "../09_text_learning/your_word_data.pkl" 
+authors_file = "../09_text_learning/your_email_authors.pkl"
 word_data = pickle.load( open(words_file, "r"))
 authors = pickle.load( open(authors_file, "r") )
-
 
 
 ### test_size is the percentage of events assigned to the test set (the
@@ -38,6 +37,23 @@ labels_train   = labels_train[:150]
 
 
 ### your code goes here
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.metrics import accuracy_score
 
+clf = DecisionTreeClassifier()
+clf.fit(features_train, labels_train)
+pred = clf.predict(features_test)
+
+print "Decision Tree accuracy: "
+print accuracy_score(pred, labels_test)
+
+print "List weight of features in the decision tree model:"
+print clf.feature_importances_[clf.feature_importances_ > 0.2]
+
+print "Print index for the most important feature:"
+print clf.feature_importances_.argmax()
+
+print "Print the word corresponding to that feature: "
+print vectorizer.get_feature_names()[clf.feature_importances_.argmax()]
 
 
