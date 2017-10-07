@@ -15,6 +15,10 @@ import sys
 sys.path.append("../tools/")
 from feature_format import featureFormat, targetFeatureSplit
 
+from sklearn import tree
+from sklearn.metrics import accuracy_score
+from sklearn.model_selection import train_test_split
+
 data_dict = pickle.load(open("../final_project/final_project_dataset.pkl", "r") )
 
 ### first element is our labels, any added elements are predictor
@@ -25,8 +29,14 @@ features_list = ["poi", "salary"]
 data = featureFormat(data_dict, features_list)
 labels, features = targetFeatureSplit(data)
 
-
-
 ### it's all yours from here forward!  
+
+# Create a simple DecisionTreeClassifier and fit it to our data.
+clf = tree.DecisionTreeClassifier()
+clf = clf.fit(features, labels)
+
+# Use the fitted model to predict and calculate the accuracy score.
+pred = clf.predict(features)
+print accuracy_score(labels, pred)
 
 
