@@ -31,12 +31,16 @@ labels, features = targetFeatureSplit(data)
 
 ### it's all yours from here forward!  
 
+# Split the data into a test and a training data set.
+labels_train, labels_test, features_train, features_test = train_test_split(
+    labels, features, test_size=0.3, random_state=42)
+
 # Create a simple DecisionTreeClassifier and fit it to our data.
 clf = tree.DecisionTreeClassifier()
-clf = clf.fit(features, labels)
+clf = clf.fit(features_train, labels_train)
 
 # Use the fitted model to predict and calculate the accuracy score.
-pred = clf.predict(features)
-print accuracy_score(labels, pred)
+pred = clf.predict(features_test)
+print accuracy_score(labels_test, pred)
 
 
