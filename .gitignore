@@ -1,6 +1,12 @@
 # Data files for the mini projects
 mini-projects/maildir/
 
+# Output files from the poi_id.py script
+final_project/my_classifier.pkl
+final_project/my_dataset.pkl
+final_project/my_feature_list.pkl
+final_project/*.jpg
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
