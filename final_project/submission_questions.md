@@ -40,6 +40,15 @@ We can’t wait to see what you’ve put together for this project!
    rubric items: “create new features”, “intelligently select features”,
    “properly scale features”]
 
+First I took a look at the different features for the email data. 
+Since there might be a difference between users in what way and volume emails
+are being sent I decided to create new features based on the ratio between total
+amount of sent and received email and the amount of emails sent and received
+to/from POI's.  Also, the email address feature are most likely not related to
+if the person is a POI or not so this will not be used in the model at all.
+
+
+
 3. What algorithm did you end up using? What other one(s) did you try? How did
    model performance differ between algorithms?  [relevant rubric item: “pick an
    algorithm”]
