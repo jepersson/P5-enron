@@ -3,6 +3,7 @@
 import sys
 import pickle
 
+import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 
@@ -17,7 +18,16 @@ with open("final_project_dataset.pkl", "r") as data_file:
 # Task 1: Select what features you'll use.
 # features_list is a list of strings, each of which is a feature name.
 # The first feature must be "poi".
-features_list = ['poi', 'salary']  # You will need to use more features
+
+# Will be using the totals from payment and stock compensations together with
+# newly calculated ratios for email data in our model. For reasoning behind
+# this continue to read here below.
+features_list = ["poi",
+                 "total_payments",
+                 "total_stock_value",
+                 "to_poi_ratio",
+                 "from_poi_ratio",
+                 "shared_with_poi_ratio"]
 
 # Task 2: Remove outliers
 # Task 3: Create new feature(s)
@@ -27,7 +37,6 @@ data_df = pd.DataFrame(data_dict).transpose()
 
 # And drop the irrelevant email_address column.
 data_df = data_df.drop("email_address", axis=1)
-
 
 # After dropping the email_address feature all remaining features are
 # numerical so we can easily convert the whole frame to numerical values.
@@ -97,7 +106,7 @@ data_df[financial_data_cols].plot(kind="box",
 ax.set_title("Financial data by features")
 plt.show()
 
-# There are nine data points standing out with a value much higher than the
+# There are some data points standing out with a value much higher than the
 # other values in their category.
 print("===")
 print("Outliers from our financial data: ")
@@ -116,6 +125,12 @@ data_df = data_df.drop("TOTAL")
 # data found here we can verify this. To keep our model simple and keep down
 # the number of unreported data points we will only use the totals of payments
 # and stock value in our model at first.
+
+# As a last step we convert all our NaNs into strings to keep compatibility
+# with the Udacity provided code.
+# Below snippet from:
+# https://discussions.udacity.com/t/featureformat-function-not-doing-its-job/192923
+data_df = data_df.replace(np.nan, 'NaN', regex=True)
 
 # Here we convert back our data frame back to a data dictionary before we
 # proceed further.
@@ -147,6 +162,7 @@ clf = GaussianNB()
 
 # Example starting point. Try investigating other evaluation techniques!
 from sklearn.cross_validation import train_test_split  # noqa
+
 features_train, features_test, labels_train, labels_test = \
     train_test_split(features, labels, test_size=0.3, random_state=42)
 
