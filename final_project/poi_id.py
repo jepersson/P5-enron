@@ -150,8 +150,16 @@ labels, features = targetFeatureSplit(data)
 # http://scikit-learn.org/stable/modules/pipeline.html
 
 # Provided to give you a starting point. Try a variety of classifiers.
-from sklearn.naive_bayes import GaussianNB  # noqa
-clf = GaussianNB()
+# Using the flow chart provided at
+# http://scikit-learn.org/stable/tutorial/machine_learning_map/index.html for
+# choosing the right estimator I decided to start by giving a linear SVC and
+# KNeighbors classifier a comparison.
+from sklearn.svm import SVC  # noqa
+from sklearn.neighbors import KNeighborsClassifier  # noqa
+
+# uncomment one of the below lines before running the script.
+# clf = SVC(kernel="linear")
+clf = KNeighborsClassifier()
 
 # Task 5: Tune your classifier to achieve better than .3 precision and recall
 # using our testing script. Check the tester.py script in the final project
@@ -165,7 +173,6 @@ from sklearn.cross_validation import train_test_split  # noqa
 
 features_train, features_test, labels_train, labels_test = \
     train_test_split(features, labels, test_size=0.3, random_state=42)
-
 
 # Task 6: Dump your classifier, dataset, and features_list so anyone can
 # check your results. You do not need to change anything below, but make sure
