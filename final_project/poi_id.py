@@ -32,7 +32,7 @@ features_list = ["poi",
 # Task 2: Remove outliers
 # Task 3: Create new feature(s)
 
-# Start by creating a dataframe from data_dict for easier feature analysis.
+# Start by creating a dataframe from data_dict for easier analysis.
 data_df = pd.DataFrame(data_dict).transpose()
 
 # And drop the irrelevant email_address column.
@@ -52,49 +52,34 @@ data_df["from_poi_ratio"] = (data_df["from_poi_to_this_person"]
                              / data_df["to_messages"])
 data_df["shared_with_poi_ratio"] = (data_df["shared_receipt_with_poi"]
                                     / data_df["to_messages"])
+# Since we don't have all emails from all users and the number of total emails
+# changes from person to person we convert the email features to ratios instead
+# of absolute numbers.
 
-# Prepare our plotting byt choosing style and columns to plot.
+# Prepare our plotting byt choosing style and defining columns to plot.
 plt.style.use("ggplot")
 email_ratio_cols = ["to_poi_ratio", "from_poi_ratio", "shared_with_poi_ratio"]
-email_data_cols = ["from_this_person_to_poi", "from_poi_to_this_person",
-                   "to_messages", "from_messages", "shared_receipt_with_poi"]
-financial_data_cols = ['salary', 'deferral_payments', 'total_payments',
+financial_data_cols = ['salary', 'deferral_payments',
                        'loan_advances', 'bonus', 'restricted_stock_deferred',
-                       'deferred_income', 'total_stock_value', 'expenses',
+                       'deferred_income', 'expenses',
                        'exercised_stock_options', 'other',
                        'long_term_incentive', 'restricted_stock',
                        'director_fees']
+financial_totals_cols = ["total_payments", "total_stock_value"]
 
-# Plot our email data to look for outliers.
-fig, ax = plt.subplots()
-data_df[email_data_cols].plot(kind="box",
-                              ax=ax)
-ax.set_title("Email data by features")
-plt.show()
-
-# We have two to_messages and one from_messages data points that are exceeding
-# 12000 counts.
-print("===")
-print("Outliers from our to_messages data: ")
-print(data_df[data_df["to_messages"] > 12000][email_data_cols])
-print("Outliers from our from_messages data: ")
-print(data_df[data_df["from_messages"] > 12000][email_data_cols])
-print("===")
-# After looking at the print out we can see that all the data points seems to
-# be valid and they will be left as is.
 
 # Plot our email ratios to look for outliers.
 fig, ax = plt.subplots()
-data_df[email_ratio_cols].plot(kind="box",
-                               ax=ax)
+data_df[email_ratio_cols].plot(kind="box", ax=ax)
 ax.set_title("Email ratios by feature")
-plt.show()
+plt.savefig("email_ratios_boxplot.jpg")
+print("---")
+print("Output email ratios box plot to email_ratios_boxplot.jpg")
 
 # There are one data point in the to_poi_ratio feature with a 1.0 ratio.
-print("===")
-print("Outlier from our to_poi_ratio data: ")
-print(data_df[data_df["to_poi_ratio"] == 1.0][email_data_cols])
-print("===")
+print("---")
+print("# Outlier from our to_poi_ratio data: ")
+print(data_df[data_df["to_poi_ratio"] == 1.0][email_ratio_cols])
 # After looking at the print out we can see that all the data point seems to
 # be valid and will be left as is.
 
@@ -102,29 +87,80 @@ print("===")
 fig, ax = plt.subplots()
 data_df[financial_data_cols].plot(kind="box",
                                   vert=False,
+                                  figsize=(16, 9),
                                   ax=ax)
 ax.set_title("Financial data by features")
-plt.show()
+plt.savefig("financial_data_boxplot.jpg")
+print("---")
+print("Output financial data box plot to financial_data_boxplot.jpg")
 
 # There are some data points standing out with a value much higher than the
 # other values in their category.
-print("===")
+print("---")
 print("Outliers from our financial data: ")
-print([data_df.loc[data_df[x].idxmax()]
-       for x in data_df.columns.values])
-print("===")
+print(data_df.loc[data_df["salary"].idxmax()])
 # After looking at the print out we can see that some data points have the
-# index TOTAL. Adding code to filter out the TOTAL entry.
-
-# Drop row with index TOTAL since this obviously isn't a person of
-# interest.
+# index TOTAL. Dropping row with index TOTAL since this obviously isn't a
+# person of interest.
+print("TOTAL row for financial data will be dropped.")
 data_df = data_df.drop("TOTAL")
+
 # As a last note we can also see that among the column names there are to
-# columns in the financial data that seems to be sums of the other columns,
+# columns in the financial data that are total values of the other columns,
 # total_payments and total_stock_value. A quick check in the description of the
-# data found here we can verify this. To keep our model simple and keep down
+# data found here we verifies this. To keep our model simple and keep down
 # the number of unreported data points we will only use the totals of payments
 # and stock value in our model at first.
+
+# Let's plot some histograms of our five choosen features to see if they are
+# relevant to our model or not.
+
+# Starting by creating a new data frame for plotting email data.
+email_df = data_df.pivot(index=data_df.index.values,
+                         columns="poi")[email_ratio_cols]
+# Getting the figure and axes
+fig, ax = plt.subplots(nrows=1, ncols=3, sharey=True)
+fig.suptitle("Email Ratio Histograms", fontsize=18)
+# Loop through the columns we want to plot and add their subplots
+i = 0
+for col in email_ratio_cols:
+    email_df[col].plot(kind="hist",
+                       alpha=0.9,
+                       title=col,
+                       range=(0, 1),
+                       figsize=(16, 5),
+                       ax=ax[i])
+    ax[i].set_yscale("log")
+    i = i + 1
+plt.savefig("email_ratio_histogram.jpg")
+print("---")
+print("Output email ratio histogram to email_ratio__histogram.jpg")
+
+# And lastly for our financial totals
+totals_df = data_df.pivot(index=data_df.index.values,
+                          columns="poi")[financial_totals_cols]
+fig, ax = plt.subplots(nrows=1, ncols=2, sharey=True)
+fig.suptitle("Financial Data Histograms", fontsize=18)
+i = 0
+for col in financial_totals_cols:
+    totals_df[col].plot(kind="hist",
+                        alpha=0.9,
+                        title=col,
+                        figsize=(16, 7),
+                        ax=ax[i])
+    ax[i].set_yscale("log")
+    i = i + 1
+plt.savefig("financial_data_histogram.jpg")
+print("---")
+print("Output financial data histogram to financial_data_histogram.jpg")
+
+
+# Financial features seems to skew slightly towards higher values for pois
+# compared to non pois. For the email ratios there are no common trend but all
+# features seems to have some difference in distribution between pois and non
+# pois, I do have my doubts regarding the from from_poi_ratio. For know we will
+# go on and use these five features until we have more evidence for or against
+# any of them.
 
 # As a last step we convert all our NaNs into strings to keep compatibility
 # with the Udacity provided code.
@@ -132,8 +168,8 @@ data_df = data_df.drop("TOTAL")
 # https://discussions.udacity.com/t/featureformat-function-not-doing-its-job/192923
 data_df = data_df.replace(np.nan, 'NaN', regex=True)
 
-# Here we convert back our data frame back to a data dictionary before we
-# proceed further.
+# Here we convert our data frame back to a data dictionary before we
+# proceeding further.
 data_dict = data_df.transpose().to_dict()
 
 # Store to my_dataset for easy export below.
@@ -158,8 +194,8 @@ from sklearn.svm import SVC  # noqa
 from sklearn.neighbors import KNeighborsClassifier  # noqa
 
 # uncomment one of the below lines before running the script.
-# clf = SVC(kernel="linear")
-clf = KNeighborsClassifier()
+clf = SVC(kernel="linear")
+# clf = KNeighborsClassifier()
 
 # Task 5: Tune your classifier to achieve better than .3 precision and recall
 # using our testing script. Check the tester.py script in the final project
