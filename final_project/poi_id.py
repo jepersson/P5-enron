@@ -23,11 +23,29 @@ with open("final_project_dataset.pkl", "r") as data_file:
 # newly calculated ratios for email data in our model. For reasoning behind
 # this continue to read here below.
 features_list = ["poi",
-                 "total_payments",
-                 "total_stock_value",
+                 # "total_payments",
+                 # "total_stock_value",
+                 'salary',
+                 'deferral_payments',
+                 'loan_advances',
+                 'bonus',
+                 'restricted_stock_deferred',
+                 'deferred_income',
+                 'expenses',
+                 'exercised_stock_options',
+                 'other',
+                 'long_term_incentive',
+                 'restricted_stock',
+                 'director_fees',
                  "to_poi_ratio",
                  "from_poi_ratio",
-                 "shared_with_poi_ratio"]
+                 "shared_with_poi_ratio"
+                 # 'to_messages',
+                 # 'from_poi_to_this_person',
+                 # 'from_messages',
+                 # 'from_this_person_to_poi',
+                 # 'shared_receipt_with_poi'
+                 ]
 
 # Task 2: Remove outliers
 # Task 3: Create new feature(s)
@@ -67,7 +85,6 @@ financial_data_cols = ['salary', 'deferral_payments',
                        'director_fees']
 financial_totals_cols = ["total_payments", "total_stock_value"]
 
-
 # Plot our email ratios to look for outliers.
 fig, ax = plt.subplots()
 data_df[email_ratio_cols].plot(kind="box", ax=ax)
@@ -98,7 +115,8 @@ print("Output financial data box plot to financial_data_boxplot.jpg")
 # other values in their category.
 print("---")
 print("Outliers from our financial data: ")
-print(data_df.loc[data_df["salary"].idxmax()])
+print([data_df.loc[data_df[x].idxmax()]
+       for x in data_df[financial_data_cols].columns.values])
 # After looking at the print out we can see that some data points have the
 # index TOTAL. Dropping row with index TOTAL since this obviously isn't a
 # person of interest.
@@ -137,23 +155,22 @@ print("---")
 print("Output email ratio histogram to email_ratio__histogram.jpg")
 
 # And lastly for our financial totals
-totals_df = data_df.pivot(index=data_df.index.values,
-                          columns="poi")[financial_totals_cols]
-fig, ax = plt.subplots(nrows=1, ncols=2, sharey=True)
+financials_df = data_df.pivot(index=data_df.index.values,
+                              columns="poi")[financial_data_cols]
+fig, ax = plt.subplots(nrows=2, ncols=6, sharey=True)
 fig.suptitle("Financial Data Histograms", fontsize=18)
 i = 0
-for col in financial_totals_cols:
-    totals_df[col].plot(kind="hist",
-                        alpha=0.9,
-                        title=col,
-                        figsize=(16, 7),
-                        ax=ax[i])
-    ax[i].set_yscale("log")
+for col in financial_data_cols:
+    financials_df[col].plot(kind="hist",
+                            alpha=0.9,
+                            title=col,
+                            figsize=(16, 7),
+                            ax=ax[i / 6][i % 6])
+    ax[i / 6][i % 6].set_yscale("log")
     i = i + 1
 plt.savefig("financial_data_histogram.jpg")
 print("---")
 print("Output financial data histogram to financial_data_histogram.jpg")
-
 
 # Financial features seems to skew slightly towards higher values for pois
 # compared to non pois. For the email ratios there are no common trend but all
@@ -161,6 +178,7 @@ print("Output financial data histogram to financial_data_histogram.jpg")
 # pois, I do have my doubts regarding the from from_poi_ratio. For know we will
 # go on and use these five features until we have more evidence for or against
 # any of them.
+
 
 # As a last step we convert all our NaNs into strings to keep compatibility
 # with the Udacity provided code.
@@ -187,15 +205,89 @@ labels, features = targetFeatureSplit(data)
 
 # Provided to give you a starting point. Try a variety of classifiers.
 # Using the flow chart provided at
-# http://scikit-learn.org/stable/tutorial/machine_learning_map/index.html for
+# http://scikit-learn.org/stable/tutor1ial/machine_learning_map/index.html for
 # choosing the right estimator I decided to start by giving a linear SVC and
 # KNeighbors classifier a comparison.
-from sklearn.svm import SVC  # noqa
+from sklearn.pipeline import Pipeline  # noqa
+from sklearn.preprocessing import MinMaxScaler  # noqa
+from sklearn.feature_selection import SelectKBest, chi2  # noqa
+from sklearn.svm import LinearSVC, SVC  # noqa
 from sklearn.neighbors import KNeighborsClassifier  # noqa
+from sklearn.ensemble import RandomForestClassifier  # noqa
+from sklearn import tree  # noqa
+from sklearn.grid_search import GridSearchCV  # noqa
+from sklearn.cross_validation import StratifiedShuffleSplit  # noqa
+
+# Pipeline for a DecisionTree classifier
+tree = Pipeline([
+    ('feature_selection', SelectKBest()),
+    ('classification', tree.DecisionTreeClassifier(class_weight="balanced",
+                                                   random_state=42))
+])
+tree_param_grid = {"feature_selection__k": range(1, 16),
+                   "classification__criterion": ["gini", "entropy"],
+                   "classification__min_samples_split": range(2, 11)}
+
+# Pipeline for a RandomForest classifier
+forest = Pipeline([
+    ('feature_selection', SelectKBest()),
+    ('classification', RandomForestClassifier(class_weight="balanced",
+                                              random_state=42))
+])
+forest_param_grid = {"feature_selection__k": range(1, 16),
+                     "classification__n_estimators": [5, 10, 15, 20, 25],
+                     "classification__criterion": ["gini", "entropy"],
+                     "classification__min_samples_split": range(2, 11)}
 
 # uncomment one of the below lines before running the script.
-clf = SVC(kernel="linear")
-# clf = KNeighborsClassifier()
+# clf = LinearSVC()
+# clf = KNeighborsClassifier(n_neighbors=5)
+# clf = SVC(kernel="rbf")
+# clf = AdaBoostClassifier(n_estimators=100)
+# clf = tree.DecisionTreeClassifier(criterion="entropy",
+#                                   min_samples_split=2,
+#                                   random_state=42)
+
+# LinearSVC results
+# C=  1, Precision: 0.15760      Recall: 0.28400
+# C= 10, Precision: 0.18195      Recall: 0.32350
+# C= 50, Precision: 0.17712      Recall: 0.32750
+# C=100, Precision: 0.20414      Recall: 0.34500
+# C=200, Precision: 0.21149      Recall: 0.31100
+# C=500, Precision: 0.22208      Recall: 0.26850
+
+# KNeighbors results
+# n_neighbors= 4, Precision: 0.24845      Recall: 0.02000
+# n_neighbors= 5, Precision: 0.53774      Recall: 0.11400
+# n_neighbors= 6, -
+# n_neighbors= 7, Precision: 0.01460      Recall: 0.00100
+
+# SVC(rbf) results
+# C=100, gamma=1.0, -
+# C=100, gamma=1.5, -
+
+# Having a hard time to get any good results due to few data points try
+# ensemble algorithms instead.
+
+# AdaBoost results
+# n_estimators= 50, learning_rate=1.0, Precision: 0.23992      Recall: 0.18150
+# n_estimators=100, learning_rate=1.0, Precision: 0.24167      Recall: 0.18500
+
+# Since many of the classifiers either have poor results due to the number of
+# data points we start searching for a simpler model to solve our
+# classification problem with. Naive Bayes could be and alternative but I am
+# not confident in assuming that all our features are independent of each
+# other, same goes for using logistic regression. In the end we start by trying
+# a decision tree classifier.
+
+# DecisionTreeClassifier results
+# min_samples_split= 2, Precision: 0.27052      Recall: 0.24550
+# min_samples_split= 3, Precision: 0.25823      Recall: 0.22750
+# min_samples_split= 4, Precision: 0.23229      Recall: 0.20500
+# Switching to entropy for impurity measures
+# min_samples_split= 2, Precision: 0.33449      Recall: 0.28850
+# min_samples_split= 3, Precision: 0.33631      Recall: 0.28250
+# min_samples_split= 4, Precision: 0.29434      Recall: 0.27300
 
 # Task 5: Tune your classifier to achieve better than .3 precision and recall
 # using our testing script. Check the tester.py script in the final project
@@ -209,6 +301,33 @@ from sklearn.cross_validation import train_test_split  # noqa
 
 features_train, features_test, labels_train, labels_test = \
     train_test_split(features, labels, test_size=0.3, random_state=42)
+
+cv = StratifiedShuffleSplit(labels_train,
+                            n_iter=100,
+                            random_state=42)
+
+tree = GridSearchCV(estimator=tree,
+                    param_grid=tree_param_grid,
+                    scoring="f1",
+                    cv=cv)
+tree = tree.fit(features_train, labels_train)
+print("---")
+print(tree.best_estimator_)
+print("F1 score: ", tree.best_score_)
+
+forest = GridSearchCV(estimator=forest,
+                      param_grid=forest_param_grid,
+                      scoring="f1",
+                      cv=cv)
+forest = forest.fit(features_train, labels_train)
+print("---")
+print(forest.best_estimator_)
+print("F1 score: ", forest.best_score_)
+
+if tree.best_score_ > forest.best_score_:
+    clf = tree.best_estimator_
+else:
+    clf = forest.best_estimator_
 
 # Task 6: Dump your classifier, dataset, and features_list so anyone can
 # check your results. You do not need to change anything below, but make sure

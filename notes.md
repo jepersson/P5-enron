@@ -28,3 +28,25 @@ with matplotlib and verify outliers.
 
 
 ```
+
+KNeighborsClassifier(algorithm='auto', leaf_size=30, metric='minkowski',
+           metric_params=None, n_jobs=1, n_neighbors=5, p=2,
+                      weights='uniform')
+                              Accuracy: 0.86880       Precision: 0.53774
+                              Recall: 0.11400 F1: 0.18812     F2: 0.13533
+                                      Total predictions: 15000        True
+                                      positives:  228    False positives:  196
+                                      False negatives: 1772   True negatives:
+                                      12804
+
+LinearSVC(C=1.0, class_weight=None, dual=True, fit_intercept=True,
+     intercept_scaling=1, loss='squared_hinge', max_iter=1000,
+          multi_class='ovr', penalty='l2', random_state=0, tol=0.0001,
+               verbose=0)
+                       Accuracy: 0.71393       Precision: 0.15979      Recall:
+                       0.26900 F1: 0.20048     F2: 0.23665
+                               Total predictions: 15000        True positives:
+                               538    False positives: 2829   False negatives:
+                               1462   True negatives: 10171
+
+
