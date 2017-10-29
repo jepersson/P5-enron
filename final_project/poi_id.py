@@ -14,6 +14,7 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.feature_selection import SelectKBest
 from sklearn.svm import SVC
 from sklearn.tree import DecisionTreeClassifier
+from sklearn.ensemble import RandomForestClassifier
 
 # Imports for model tuning and evaluation.
 from time import time
@@ -210,7 +211,6 @@ print("Output financial data histogram to financial_data_histogram.jpg")
 # (https://discussions.udacity.com/t/deciding-on-how-many-features-i-should-use/160726)
 # and the poor performance I had on my laptop trying to compute SelectKBest
 # selections directly in the Pipeline for all ks.
-
 k_best = SelectKBest(k="all")
 feature_cols = email_ratio_cols + financial_data_cols
 best_features = k_best.fit(X=data_df[feature_cols].fillna(0),
@@ -220,7 +220,6 @@ feature_scores = pd.Series(data=best_features.scores_,
 print("---")
 print("F-values for each feature:")
 print(feature_scores.sort_values())
-
 # There are some small gaps in the sorted values of F-scores, we will use each
 # such gap a candidate for a k-value. (e.g. k=[2, 5, 7, 11, 13, 15]
 # restricted_stock_deferred     0.064477
@@ -238,6 +237,7 @@ print(feature_scores.sort_values())
 # salary                       18.861795
 # bonus                        21.327890
 # exercised_stock_options      25.380105
+
 
 # Preparation 3: Convert the dataframe back to previous datadict format
 
@@ -278,8 +278,8 @@ tree = Pipeline([
                                               random_state=42))
 ])
 tree_param_grid = {"feature_selection__k": [2, 5, 7, 11, 13, 15],
-                   "criterion": ["gini", "entropy"],
-                   "min_samples_split": range(2, 21)}
+                   "classification__criterion": ["gini", "entropy"],
+                   "classification__min_samples_split": range(2, 21)}
 
 # Task 5: Tune your classifier to achieve better than .3 precision and recall
 # using our testing script. Check the tester.py script in the final project
@@ -325,11 +325,60 @@ print("F1 score: ", tree.best_score_)
 print("Time to fit: ", round(time()-t0))
 test_classifier(tree.best_estimator_, my_dataset, features_list)
 
-# Export best scoring estimator as clf
-if svc.best_score_ < tree.best_score_:
-    clf = tree.best_estimator_
-else:
-    clf = svc.best_estimator_
+
+# Using the DecisionTree algorithm for classification seems promising. But I
+# suspect we still can get better results. To do this let's try Random Forest
+# algorithm instead where we generate multiple trees and combine their results
+# in order to classify a data point. This could even out some of the issues
+# that might be due to overfitting to our training data set. we will use the
+# same parameters as our best tree and only change the number of trees
+# generated.
+
+# Pipeline for a RandomForest classifier
+forest = Pipeline([
+    ("feature_selection", SelectKBest()),
+    ("classification", RandomForestClassifier(class_weight="balanced",
+                                              random_state=42))
+])
+forest_param_grid = {"feature_selection__k": [7],
+                     "classification__criterion": ["gini"],
+                     "classification__min_samples_split": [19],
+                     "classification__n_estimators": [2, 5, 10, 25, 50, 100,
+                                                      150, 200, 250, 500]}
+forest = GridSearchCV(estimator=forest,
+                      param_grid=forest_param_grid,
+                      scoring="f1",
+                      cv=cv)
+t0 = time()
+forest = forest.fit(features_train, labels_train)
+print("---")
+print("F1 score: ", forest.best_score_)
+print("Time to fit: ", round(time()-t0))
+test_classifier(forest.best_estimator_, my_dataset, features_list)
+
+# Plot scores for each estimator value.
+estimators = [x[0]["classification__n_estimators"]
+              for x in forest.grid_scores_]
+scores = [x[1] for x in forest.grid_scores_]
+fig, ax = plt.subplots()
+ax.plot(estimators, scores)
+ax.set_title("F1-score vs number of estimators in Random Forest Model")
+plt.savefig("f1_vs_estimators.jpg")
+print("---")
+print("Output F1-score vs estimators plot to f1_vs_estimators.jpg")
+# We can see that the gains aren't much after n_estimators=50 and upwards so we
+# set it to 50.
+
+# Initializing the final best classifier with all parameters and exporting it
+# as clf.
+clf = Pipeline([
+    ("feature_selection", SelectKBest(k=7)),
+    ("classification", RandomForestClassifier(criterion="gini",
+                                              min_samples_split=19,
+                                              n_estimators=50,
+                                              class_weight="balanced",
+                                              random_state=42))
+])
 
 # Task 6: Dump your classifier, dataset, and features_list so anyone can
 # check your results. You do not need to change anything below, but make sure
