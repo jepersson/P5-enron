@@ -101,7 +101,7 @@ print("---")
 print("Outlier in financial data found: ")
 print(data_df.loc[data_df["salary"].idxmax()])
 
-# After looking at the print out we can see that one row has the index TOTAL.
+# After looking at the print out we can see that the index is TOTAL.
 # Dropping this row since this obviously isn't a person of interest.
 print("TOTAL rows for financial data will be dropped.")
 data_df = data_df.drop("TOTAL")
@@ -135,13 +135,17 @@ print(data_df["poi"].describe())
 # a lot more balanced ratio between classes in this type of classification
 # problems so we need to take this into account when choosing our machine
 # learning algorithm later on. No unknowns are listed.
+# Worth to note here is that with this much unbalance between POIs and non-POIs
+# by just guessing non-POI we will achieve an accuracy of 88%. Due to this we
+# will use the F score together with recall and precision while evaluating our
+# algorithms rather than just accuracy.
 
 print("---")
 print("Printing descriptive statistics for the email ratio features:")
 print(data_df[email_ratio_cols].describe())
 # For the email data we can see that we have 86 data points, around 60% of the
 # total dataset. Since we recalculated the features to ratios all values are
-# lying in the 0 to 1 intervall.
+# lying in the 0 to 1 interval.
 
 print("---")
 print("Printing descriptive statistics for the financial features:")
@@ -151,7 +155,7 @@ print(data_df[financial_data_cols].describe())
 # different sizes for different features etc.
 
 
-# Let's plot some histograms of our choosen features to see if they are
+# Let's plot some histograms of our chosen features to see if they are
 # relevant to our model or not.
 
 # Starting by creating a new data frame for plotting email data.
@@ -193,15 +197,15 @@ plt.savefig("financial_data_histogram.jpg")
 print("---")
 print("Output financial data histogram to financial_data_histogram.jpg")
 
-# Financial features seems to skew slightly towards higher values for pois
-# compared to non pois. For the email ratios there are no common trend but all
-# features seems to have some difference in distribution between pois and non
-# pois, I do have my doubts regarding the from from_poi_ratio. For know we will
+# Financial features seems to skew slightly towards higher values for POIs
+# compared to non POIs. For the email ratios there are no common trend but all
+# features seems to have some difference in distribution between POIs and non
+# POIs, I do have my doubts regarding the from from_poi_ratio. For know we will
 # go on and use these five features until we have more evidence for or against
 # any of them.
 
 # Before training we will use SelectKBest to calculate ANOVA
-# F-statistic for each feature we have choosen. The idea comes from
+# F-statistic for each feature we have chosen. The idea comes from
 # this forum thread
 # (https://discussions.udacity.com/t/deciding-on-how-many-features-i-should-use/160726)
 # and the poor performance I had on my laptop trying to compute SelectKBest
@@ -218,8 +222,7 @@ print("F-values for each feature:")
 print(feature_scores.sort_values())
 
 # There are some small gaps in the sorted values of F-scores, we will use each
-# such gap a candidate for a k-value.
-# (e.g. k=[2, 5, 7, 11, 13, 15]
+# such gap a candidate for a k-value. (e.g. k=[2, 5, 7, 11, 13, 15]
 # restricted_stock_deferred     0.064477
 # deferral_payments             0.209706
 # director_fees                 2.089310
@@ -251,24 +254,32 @@ data_dict = data_df.transpose().to_dict()
 my_dataset = data_dict
 
 
-# Task 4: Try a varity of classifiers
+# Task 4: Try a variety of classifiers
 # Please name your classifier clf for easy export below.
+# We start by pitting a SVM against a decision tree to see which algorithm is
+# better suited.
 
 # Pipeline for a SVC(SVM) classifier
 svc = Pipeline([
-    ('feature_scaling', StandardScaler()),
-    ('classification', SVC(kernel="rbf",
+    ("feature_scaling", StandardScaler()),
+    ("feature_selection", SelectKBest()),
+    ("classification", SVC(kernel="rbf",
                            class_weight="balanced",
                            random_state=42))
 ])
-svc_param_grid = {"classification__C": [0.1, 1, 10, 100],
+svc_param_grid = {"feature_selection__k": [2, 5, 7, 11, 13, 15],
+                  "classification__C": [0.1, 1, 10, 100],
                   "classification__gamma": [0.01, 0.1, 1, 10]}
 
 # Pipeline for a DecisionTree classifier
-tree = DecisionTreeClassifier(class_weight="balanced",
-                              random_state=42)
-tree_param_grid = {"criterion": ["gini", "entropy"],
-                   "min_samples_split": range(2, 11)}
+tree = Pipeline([
+    ("feature_selection", SelectKBest()),
+    ("classification", DecisionTreeClassifier(class_weight="balanced",
+                                              random_state=42))
+])
+tree_param_grid = {"feature_selection__k": [2, 5, 7, 11, 13, 15],
+                   "criterion": ["gini", "entropy"],
+                   "min_samples_split": range(2, 21)}
 
 # Task 5: Tune your classifier to achieve better than .3 precision and recall
 # using our testing script. Check the tester.py script in the final project
