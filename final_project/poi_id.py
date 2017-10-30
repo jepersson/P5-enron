@@ -74,14 +74,15 @@ data_df = data_df.apply(lambda x: pd.to_numeric(x, errors='coerce'))
 
 # Prepare our plotting byt choosing style and defining columns to plot.
 plt.style.use("ggplot")
-email_ratio_cols = ["to_poi_ratio", "from_poi_ratio", "shared_with_poi_ratio"]
 financial_data_cols = ['salary', 'deferral_payments',
                        'loan_advances', 'bonus', 'restricted_stock_deferred',
                        'deferred_income', 'expenses',
                        'exercised_stock_options', 'other',
                        'long_term_incentive', 'restricted_stock',
                        'director_fees']
-
+email_data_cols = ["to_messages", "from_messages", "from_poi_to_this_person",
+                   "from_this_person_to_poi", "shared_receipt_with_poi"]
+email_ratio_cols = ["to_poi_ratio", "from_poi_ratio", "shared_with_poi_ratio"]
 
 # Task 2: Remove outliers
 
@@ -107,7 +108,19 @@ print(data_df.loc[data_df["salary"].idxmax()])
 print("TOTAL rows for financial data will be dropped.")
 data_df = data_df.drop("TOTAL")
 
-# TODO: Make plot for the original email data too!
+# Plotting the email data
+fig, ax = plt.subplots()
+data_df[email_data_cols].plot(kind="box",
+                              vert=False,
+                              figsize=(16, 9),
+                              ax=ax)
+ax.set_title("Email data by features")
+plt.savefig("email_data_boxplot.jpg")
+print("---")
+print("Output email data box plot to email_data_boxplot.jpg")
+# As seen in the plot and given the same procedure as from the financial data
+# there are some data points that sticks out as having remarkably high counts
+# but after further inspection they seem valid.
 
 
 # Task 3: Create new feature(s)
@@ -344,7 +357,7 @@ forest_param_grid = {"feature_selection__k": [7],
                      "classification__criterion": ["gini"],
                      "classification__min_samples_split": [19],
                      "classification__n_estimators": [2, 5, 10, 25, 50, 100,
-                                                      150, 200, 250, 500]}
+                                                      150]}
 forest = GridSearchCV(estimator=forest,
                       param_grid=forest_param_grid,
                       scoring="f1",
@@ -355,6 +368,9 @@ print("---")
 print("F1 score: ", forest.best_score_)
 print("Time to fit: ", round(time()-t0))
 test_classifier(forest.best_estimator_, my_dataset, features_list)
+print("Chosen features for the best estimator: ")
+selected_features = forest.best_estimator_.named_steps["feature_selection"].get_support(indices=True)  # noqa
+print([features_list[x] for x in selected_features])
 
 # Plot scores for each estimator value.
 estimators = [x[0]["classification__n_estimators"]
@@ -366,8 +382,8 @@ ax.set_title("F1-score vs number of estimators in Random Forest Model")
 plt.savefig("f1_vs_estimators.jpg")
 print("---")
 print("Output F1-score vs estimators plot to f1_vs_estimators.jpg")
-# We can see that the gains aren't much after n_estimators=50 and upwards so we
-# set it to 50.
+# We can see that the starts to overfit and get worse results for values of
+# n_estimators after 100 so we set the parameter to 100.
 
 # Initializing the final best classifier with all parameters and exporting it
 # as clf.
@@ -375,10 +391,11 @@ clf = Pipeline([
     ("feature_selection", SelectKBest(k=7)),
     ("classification", RandomForestClassifier(criterion="gini",
                                               min_samples_split=19,
-                                              n_estimators=50,
+                                              n_estimators=100,
                                               class_weight="balanced",
                                               random_state=42))
 ])
+
 
 # Task 6: Dump your classifier, dataset, and features_list so anyone can
 # check your results. You do not need to change anything below, but make sure
