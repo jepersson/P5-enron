@@ -27,6 +27,23 @@ We can’t wait to see what you’ve put together for this project!
    any outliers in the data when you got it, and how did you handle those?
    [relevant rubric items: “data exploration”, “outlier investigation”] 
 
+The goal is to classify persons of interest(POI) present in a data set made
+available during the Enron trial. The original data is consisting of a
+collection of internal emails connected to the persons being on trial. The
+version of the data set used in this project has been enhanced with financial
+data also made available at the time. The target variable POI is a boolean where
+people who evidently had connection to the fraud which led to Enron's downfall
+(e.g. persons found guilty, settled, or witnessing in exchange for immunity).
+
+Initially looking at the provided feature I made the decision to omit the email
+feature right away since the email address most likely do not have any
+connection to the probability of someone being a POI or not. The totals
+(total_stock_value and total_payments) from the financial data where also
+omitted since this information is redundant and possible to infer from the other
+financial features. After some further investigation a row inside the data set
+containing totals (TOTAL) was also found and dropped from the financial data.
+All other entries were left as is.  
+
 2. What features did you end up using in your POI identifier, and what selection
    process did you use to pick them? Did you have to do any scaling? Why or why
    not? As part of the assignment, you should attempt to engineer your own
@@ -40,18 +57,86 @@ We can’t wait to see what you’ve put together for this project!
    rubric items: “create new features”, “intelligently select features”,
    “properly scale features”]
 
-First I took a look at the different features for the email data. 
-Since there might be a difference between users in what way and volume emails
-are being sent I decided to create new features based on the ratio between total
-amount of sent and received email and the amount of emails sent and received
-to/from POI's.  Also, the email address feature are most likely not related to
-if the person is a POI or not so this will not be used in the model at all.
+After cleaning up the financial features attention were given to the email
+features for the next step. The email data was spotty and we are unable to
+discern if the emails included are exhaustive or not. To mitigate the effects
+of possible selection bias due to shifting sample sizes the five existing email
+features were combined into three ratios based on the amount of emails sent
+to/from each person respectively. The ratios were calculated as seen here below.
 
+```python
+# Create new features for the email data:
+# - to_poi_ratio          (ratio of outgoing emails addressed to POI)
+# - from_poi_ratio        (ratio of incoming emails from POI)
+# - shared_with_poi_ratio (ratio of incoming emails which are shared with POI)
+data_df["to_poi_ratio"] = (data_df["from_this_person_to_poi"]
+                           / data_df["from_messages"])
+data_df["from_poi_ratio"] = (data_df["from_poi_to_this_person"]
+                             / data_df["to_messages"])
+data_df["shared_with_poi_ratio"] = (data_df["shared_receipt_with_poi"]
+                                    / data_df["to_messages"])
+```
 
+After the initial clean up described above a descriptive data analysis were
+performed including a list up of the F-values for each of the remaining 15
+features with respect to the POI label (All existing data given were used for
+this calculation). Loosely based on the values distribution the below values
+were chosen as input for a SelectKBest function in the later model tuning step
+were they will be further evaluated using the exhaustive GridSearchCV evaluation
+function.
+
+```
+# F-values calculated for features with respect to POI.
+restricted_stock_deferred     0.064477
+deferral_payments             0.209706
+director_fees                 2.089310
+from_poi_ratio                3.293829
+other                         4.263577
+expenses                      6.374614
+loan_advances                 7.301407
+restricted_stock              9.480743
+shared_with_poi_ratio         9.491458
+long_term_incentive          10.222904
+deferred_income              11.732698
+to_poi_ratio                 16.873870
+salary                       18.861795
+bonus                        21.327890
+exercised_stock_options      25.380105
+```
+
+Potential parameter Values chosen for SelectKBest's k:
+```
+[2, 5, 7, 11, 13, 15]
+```
 
 3. What algorithm did you end up using? What other one(s) did you try? How did
    model performance differ between algorithms?  [relevant rubric item: “pick an
    algorithm”]
+
+Reflecting on the models for supervised learning being presented in the intro to
+machine learning lesson material I wanted to choose a model that is as simple as
+possible so that I still am able to made informed decisions when advancing into
+the parameter tuning stage. This might say more about my current experience with
+machine learning rather than the data itself but are nonetheless a valid point
+to make.  This assumption gave me three candidates presented early in the
+course: Naive Bayes, SVM, and Decision Trees. Naive Bayes were omitted since I
+didn't feel confident about finding a good prior for our data without resorting
+to pure guessing. This left the SVM and Decision Tree models as valid selections
+for the next step.
+
+One SVM and one Decision Tree classifier where compared and the Decision Tree
+were chosen based on better performance in respect to it's F1 value. The reason
+for choosing the F1 value as a key indicator rather than accuracy is due to the
+unbalanced nature of the POI label. There are only 18 POIs and 127 non-POIs in
+our data set which means that we able to get rather high accuracy (88%) just by
+guessing non-POI for everything which isn't very helpful since our goal is to
+classify potential POIs. Further, when comparing the models one extra step were
+added to the SVM pipeline to standardize the input values since the SVM model
+expects standardized features while the Decision Tree works better with
+non-standardized features.
+
+In the end a RandomForest model were chosen to mitigate the risk of over fitting
+our model and to increase the performance on our testing data set.
 
 4. What does it mean to tune the parameters of an algorithm, and what can happen
    if you don’t do this well?  How did you tune the parameters of your
@@ -62,12 +147,105 @@ if the person is a POI or not so this will not be used in the model at all.
    parameter tuning, e.g. a decision tree classifier).  [relevant rubric items:
    “discuss parameter tuning”, “tune the algorithm”]
 
+Parameter tuning is the process of finding the optimal or good enough values for
+the input parameters the chosen model needs, excluding the target data set's
+features and labels. The method I used to initially tune the parameters for the
+SVM and Decision Tree models is called GridSearchCV and is provided in the
+sklearn library. GridSearchCV performs an exhaustive search over all
+combinations of the provided candidate parameter inputted and evaluates them
+using a specified measure, in this case the F1-value. The candidate values
+chosen for the models can be seen here below.
+
+```python
+# Candidate parameters for the SVC(SVM) model used in GridSearchCV.
+svc_param_grid = {"feature_selection__k": [2, 5, 7, 11, 13, 15],
+                  "classification__C": [0.1, 1, 10, 100],
+                  "classification__gamma": [0.01, 0.1, 1, 10]}
+
+
+# Candidate parameters for the Decision Tree model used in GridSearchCV.
+tree_param_grid = {"feature_selection__k": [2, 5, 7, 11, 13, 15],
+                   "classification__criterion": ["gini", "entropy"],
+                   "classification__min_samples_split": range(2, 21)}
+```
+
+Given the above candidate hyper parameters the Decision Tree model came out as a
+winner. However, since using this model just like this is prone to over fitting
+and not very common in the real world (or so I have heard) we didn't stop here.
+Instead we took our modelling one step further and used the tuned Decision Tree
+hyperparameters as input for a Random Forest classifier which creates multiple
+trees from subsets of our data to make many weak predictions that we then can
+combine using majority voting to increase the stability of our model. Tuning
+were performed once again with the below candidate parameters and the F1-score
+for the chosen n_estimator values and by looking at the below plot we could
+discern that the best value for our n_estimator is 100.
+
+```python
+# Candidate parameters fir the Random Forest model used in GridSearchCV
+forest_param_grid = {"feature_selection__k": [7],
+                     "classification__criterion": ["gini"],
+                     "classification__min_samples_split": [19],
+                     "classification__n_estimators": [2, 5, 10, 25, 50, 100,
+                                                      150]}
+```
+
+![F1 scores vs n_estimators](/f1_vs_estimators.jpg)
+
 5. What is validation, and what’s a classic mistake you can make if you do it
    wrong? How did you validate your analysis?  [relevant rubric items: “discuss
    validation”, “validation strategy”]
+
+In machine learning validation means to check your models general performance 
+in contrast to it's performance on the data used to fit the model initially.
+This is to simulate how the model would perform using new and unseen data and an
+invaluable tool for avoiding over fitting your model to noise only existing in
+the data used initially.
+
+In order to do this practically we need to split up our data in two sets, one
+used for training and one used for testing. Since our data set is rather small
+and as mentiond earlier are labels are unbalanced StratifiedShuffleSplit (also
+used in the provided tester.py) from sklearn where used to split up our data set
+into testing and training sets while trying to keep the ratio of POIs and
+non-POIs from the initial data. To make our validation more robust we split the
+data multiple times creating 1000 different pairs of training and testing data
+before performing crossvalidation and calculating our performance metrics as
+means for all 1000 different variations.
 
 6. Give at least 2 evaluation metrics and your average performance for each of
    them.  Explain an interpretation of your metrics that says something
    human-understandable about your algorithm’s performance. [relevant rubric
    item: “usage of evaluation metrics”]
 
+Running the final model through the provided tester.py results in the below
+output.
+
+```
+Pipeline(memory=None,
+        steps=[('feature_selection', SelectKBest(k=7, 
+                                                 score_func=<function f_classif at 0x107cb4b90>)), 
+               ('classification', RandomForestClassifier(bootstrap=True, 
+                                                         class_weight='balanced',
+                                                         criterion='gini', 
+                                                         max_depth=None, 
+                                                         max_features='auto', 
+                                                         max_leaf_nodes=None, 
+                                                         min_impurity_decrease...timators=100, 
+                                                         n_jobs=1, 
+                                                         oob_score=False, 
+                                                         random_state=42, 
+                                                         verbose=0, 
+                                                         warm_start=False))
+               ])
+
+Accuracy:   0.83687   
+Precision:  0.40791         Recall: 0.49500 
+F1:         0.44726         F2:     0.47473
+
+Total predictions:  15000    
+True positives:     990     False positives:    1437    
+False negatives:    1010    True negatives:     11563
+```
+
+Focusing on the Precision and Recall values we can see that 40% of our model's
+predicted POIs are correct(Precision) while 49% of the POIs existing
+in the data set where found successfully(Recall).

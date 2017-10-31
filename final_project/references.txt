@@ -1,0 +1,8 @@
+Forum thread referenced for use of SelectKBest to get F-values:
+https://discussions.udacity.com/t/deciding-on-how-many-features-i-should-use/160726
+
+Took the line for replacing NaN values with "NaN" strings from below Forum thread:
+https://discussions.udacity.com/t/featureformat-function-not-doing-its-job/192923
+
+Except for pandas, matplotlib and sklearn documentation and code found in
+provided files no other sources where directly used for this project.

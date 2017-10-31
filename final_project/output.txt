@@ -1,0 +1,146 @@
+---
+Output financial data box plot to financial_data_boxplot.jpg
+---
+Outlier in financial data found: 
+bonus                        9.73436e+07
+deferral_payments            3.20834e+07
+deferred_income             -2.79929e+07
+director_fees                1.39852e+06
+exercised_stock_options      3.11764e+08
+expenses                      5.2352e+06
+from_messages                        NaN
+from_poi_to_this_person              NaN
+from_this_person_to_poi              NaN
+loan_advances                 8.3925e+07
+long_term_incentive          4.85219e+07
+other                        4.26676e+07
+poi                                False
+restricted_stock             1.30322e+08
+restricted_stock_deferred   -7.57679e+06
+salary                       2.67042e+07
+shared_receipt_with_poi              NaN
+to_messages                          NaN
+Name: TOTAL, dtype: object
+TOTAL rows for financial data will be dropped.
+---
+Output email data box plot to email_data_boxplot.jpg
+---
+Printing descriptive statistics for the POI label:
+count       145
+unique        2
+top       False
+freq        127
+Name: poi, dtype: object
+---
+Printing descriptive statistics for the email ratio features:
+       to_poi_ratio  from_poi_ratio  shared_with_poi_ratio
+count     86.000000       86.000000              86.000000
+mean       0.184055        0.037963               0.609058
+std        0.210610        0.040544               0.287300
+min        0.000000        0.000000               0.018377
+25%        0.012421        0.009200               0.413779
+50%        0.100574        0.025845               0.661044
+75%        0.272039        0.056089               0.841199
+max        1.000000        0.217341               1.001145
+---
+Printing descriptive statistics for the financial features:
+             salary  deferral_payments  loan_advances         bonus  \
+count  9.400000e+01       3.800000e+01   3.000000e+00  8.100000e+01   
+mean   2.840875e+05       8.416025e+05   2.797500e+07  1.201773e+06   
+std    1.771311e+05       1.289323e+06   4.638256e+07  1.441679e+06   
+min    4.770000e+02      -1.025000e+05   4.000000e+05  7.000000e+04   
+25%    2.118020e+05       7.964450e+04   1.200000e+06  4.250000e+05   
+50%    2.587410e+05       2.210635e+05   2.000000e+06  7.500000e+05   
+75%    3.086065e+05       8.672112e+05   4.176250e+07  1.200000e+06   
+max    1.111258e+06       6.426990e+06   8.152500e+07  8.000000e+06   
+
+       restricted_stock_deferred  deferred_income       expenses  \
+count               1.700000e+01     4.800000e+01      94.000000   
+mean                6.218928e+05    -5.810498e+05   54192.010638   
+std                 3.845528e+06     9.420764e+05   46108.377454   
+min                -1.787380e+06    -3.504386e+06     148.000000   
+25%                -3.298250e+05    -6.112092e+05   22479.000000   
+50%                -1.402640e+05    -1.519270e+05   46547.500000   
+75%                -7.241900e+04    -3.792600e+04   78408.500000   
+max                 1.545629e+07    -8.330000e+02  228763.000000   
+
+       exercised_stock_options         other  long_term_incentive  \
+count             1.010000e+02  9.200000e+01         6.500000e+01   
+mean              2.959559e+06  4.652767e+05         7.464912e+05   
+std               5.499450e+06  1.389719e+06         8.629174e+05   
+min               3.285000e+03  2.000000e+00         6.922300e+04   
+25%               5.067650e+05  1.209000e+03         2.750000e+05   
+50%               1.297049e+06  5.198450e+04         4.221580e+05   
+75%               2.542813e+06  3.575772e+05         8.318090e+05   
+max               3.434838e+07  1.035973e+07         5.145434e+06   
+
+       restricted_stock  director_fees  
+count      1.090000e+02      16.000000  
+mean       1.147424e+06   89822.875000  
+std        2.249770e+06   41112.700735  
+min       -2.604490e+06    3285.000000  
+25%        2.520550e+05   83674.500000  
+50%        4.410960e+05  106164.500000  
+75%        9.850320e+05  112815.000000  
+max        1.476169e+07  137864.000000  
+---
+Output email ratio histogram to email_ratio__histogram.jpg
+---
+Output financial data histogram to financial_data_histogram.jpg
+---
+F-values for each feature:
+restricted_stock_deferred     0.064477
+deferral_payments             0.209706
+director_fees                 2.089310
+from_poi_ratio                3.293829
+other                         4.263577
+expenses                      6.374614
+loan_advances                 7.301407
+restricted_stock              9.480743
+shared_with_poi_ratio         9.491458
+long_term_incentive          10.222904
+deferred_income              11.732698
+to_poi_ratio                 16.873870
+salary                       18.861795
+bonus                        21.327890
+exercised_stock_options      25.380105
+dtype: float64
+---
+('F1 score: ', 0.34623968253968235)
+('Time to fit: ', 984.0)
+Pipeline(memory=None,
+     steps=[('feature_scaling', StandardScaler(copy=True, with_mean=True, with_std=True)), ('feature_selection', SelectKBest(k=11, score_func=<function f_classif at 0x107cb4b90>)), ('classification', SVC(C=1, cache_size=200, class_weight='balanced', coef0=0.0,
+  decision_function_shape='ovr', degree=3, gamma=0.01, kernel='rbf',
+  max_iter=-1, probability=False, random_state=42, shrinking=True,
+  tol=0.001, verbose=False))])
+	Accuracy: 0.69007	Precision: 0.24834	Recall: 0.65350	F1: 0.35991	F2: 0.49272
+	Total predictions: 15000	True positives: 1307	False positives: 3956	False negatives:  693	True negatives: 9044
+
+---
+('F1 score: ', 0.4855912698412697)
+('Time to fit: ', 1953.0)
+Pipeline(memory=None,
+     steps=[('feature_selection', SelectKBest(k=7, score_func=<function f_classif at 0x107cb4b90>)), ('classification', DecisionTreeClassifier(class_weight='balanced', criterion='gini',
+            max_depth=None, max_features=None, max_leaf_nodes=None,
+            min_impurity_decrease=0.0, min_impurity_split=None,
+            min_samples_leaf=1, min_samples_split=19,
+            min_weight_fraction_leaf=0.0, presort=False, random_state=42,
+            splitter='best'))])
+	Accuracy: 0.75687	Precision: 0.30104	Recall: 0.62300	F1: 0.40593	F2: 0.51322
+	Total predictions: 15000	True positives: 1246	False positives: 2893	False negatives:  754	True negatives: 10107
+
+---
+('F1 score: ', 0.3459452380952373)
+('Time to fit: ', 1361.0)
+Pipeline(memory=None,
+     steps=[('feature_selection', SelectKBest(k=7, score_func=<function f_classif at 0x107cb4b90>)), ('classification', RandomForestClassifier(bootstrap=True, class_weight='balanced',
+            criterion='gini', max_depth=None, max_features='auto',
+            max_leaf_nodes=None, min_impurity_decrease...timators=100, n_jobs=1, oob_score=False, random_state=42,
+            verbose=0, warm_start=False))])
+	Accuracy: 0.83687	Precision: 0.40791	Recall: 0.49500	F1: 0.44726	F2: 0.47473
+	Total predictions: 15000	True positives:  990	False positives: 1437	False negatives: 1010	True negatives: 11563
+
+Chosen features for the best estimator: 
+['expenses', 'loan_advances', 'restricted_stock', 'deferred_income', 'to_poi_ratio', 'salary', 'bonus']
+---
+Output F1-score vs estimators plot to f1_vs_estimators.jpg
