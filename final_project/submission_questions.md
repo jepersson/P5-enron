@@ -167,7 +167,7 @@ SVM and Decision Tree models is called GridSearchCV and is provided in the
 sklearn library. GridSearchCV performs an exhaustive search over all
 combinations of the provided candidate parameter inputted and evaluates them
 using a specified measure, in this case the F1-value. The candidate values
-chosen for the models can be seen here below.
+chosen and performance for the models can be seen here below.
 
 ```python
 # Candidate parameters for the SVC(SVM) model used in GridSearchCV.
@@ -180,6 +180,64 @@ svc_param_grid = {"feature_selection__k": [2, 5, 7, 11, 13, 15],
 tree_param_grid = {"feature_selection__k": [2, 5, 7, 11, 13, 15],
                    "classification__criterion": ["gini", "entropy"],
                    "classification__min_samples_split": range(2, 21)}
+```
+
+```
+# SVM performance for best parameter set
+Pipeline(memory=None,
+         steps=[('feature_scaling', StandardScaler(copy=True, 
+                                                   with_mean=True, 
+                                                   with_std=True)), 
+                ('feature_selection', SelectKBest(k=11, 
+                                                  score_func=<function f_classif at 0x107cb4b90>)), 
+                ('classification', SVC(C=1, 
+                                       cache_size=200, 
+                                       class_weight='balanced', 
+                                       coef0=0.0,
+                                       decision_function_shape='ovr', 
+                                       degree=3, 
+                                       gamma=0.01, 
+                                       kernel='rbf',
+                                       max_iter=-1, 
+                                       probability=False, 
+                                       random_state=42, 
+                                       shrinking=True,
+                                       tol=0.001, 
+                                       verbose=False))])
+
+Accuracy:   0.69007	
+Precision:  0.24834     Recall: 0.65350	
+F1:         0.35991     F2:     0.49272
+
+Total predictions:  15000
+True positives:     1307    False positives:    3956
+False negatives:    693     True negatives:     9044
+
+# Decision Tree performance for best parameter set
+Pipeline(memory=None,
+         steps=[('feature_selection', SelectKBest(k=7, 
+                                                  score_func=<function f_classif at 0x107cb4b90>)), 
+                ('classification', DecisionTreeClassifier(class_weight='balanced', 
+                                                          criterion='gini',
+                                                          max_depth=None, 
+                                                          max_features=None, 
+                                                          max_leaf_nodes=None,
+                                                          min_impurity_decrease=0.0, 
+                                                          min_impurity_split=None,
+                                                          min_samples_leaf=1, 
+                                                          min_samples_split=19,
+                                                          min_weight_fraction_leaf=0.0, 
+                                                          presort=False, 
+                                                          random_state=42,
+                                                          splitter='best'))])
+
+Accuracy:   0.75687
+Precision:  0.30104     Recall: 0.62300	
+F1:         0.40593     F2:     0.51322
+
+Total predictions:  15000
+True positives:     1246        False positives:    2893	
+False negatives:    754         True negatives:     10107
 ```
 
 Given the above candidate hyper parameters the Decision Tree model came out as a
@@ -247,8 +305,7 @@ Pipeline(memory=None,
                                                          oob_score=False, 
                                                          random_state=42, 
                                                          verbose=0, 
-                                                         warm_start=False))
-               ])
+                                                         warm_start=False))])
 
 Accuracy:   0.83687   
 Precision:  0.40791         Recall: 0.49500 
