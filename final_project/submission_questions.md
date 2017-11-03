@@ -62,7 +62,10 @@ features for the next step. The email data was spotty and we are unable to
 discern if the emails included are exhaustive or not. To mitigate the effects
 of possible selection bias due to shifting sample sizes the five existing email
 features were combined into three ratios based on the amount of emails sent
-to/from each person respectively. The ratios were calculated as seen here below.
+to/from each person respectively. My hope is that doing this will help avoid
+over fitting our model by reducing noise solely from the sampling method and we
+will revisit this decision once more towards the end of the analysis to see if
+my hypothesis is correct or not. The ratios were calculated as seen here below.
 
 ```python
 # Create new features for the email data:
@@ -77,13 +80,23 @@ data_df["shared_with_poi_ratio"] = (data_df["shared_receipt_with_poi"]
                                     / data_df["to_messages"])
 ```
 
-After the initial clean up described above a descriptive data analysis were
-performed including a list up of the F-values for each of the remaining 15
-features with respect to the POI label (All existing data given were used for
-this calculation). Loosely based on the values distribution the below values
-were chosen as input for a SelectKBest function in the later model tuning step
-were they will be further evaluated using the exhaustive GridSearchCV evaluation
-function.
+After the initial clean up described above were finished a descriptive data
+analysis were performed. We found that from a total of 145 data points 127 were
+labeled non-POIs and 18 labeled as POIs. In total we have 15 features at the
+moment not including the given email features since we will switch out these for
+our new email ratio features instead. The new made email features consists of
+86 data points all of them spanning between 0 and 1 since we created them as
+ratios. The most heterogeneous features comes from the financial data features
+which ranges from just 16 up to 109 data points depending on which features we
+are looking at. However, the financial features differ from our email features
+since non-existing values simply are non-existent (zero) while for the email
+features we are unable to tell if no data really means no occurrences or if it
+just means no data. Further, a list up of the F-values for each of the
+remaining 15 features with respect to the POI label (All existing data given
+were used for this calculation). Loosely based on the values distribution the
+below values were chosen as input for a SelectKBest function in the later model
+tuning step were they will be further evaluated using the exhaustive
+GridSearchCV evaluation function.  
 
 ```
 # F-values calculated for features with respect to POI.
