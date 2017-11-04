@@ -5,7 +5,6 @@ mini-projects/maildir/
 final_project/my_classifier.pkl
 final_project/my_dataset.pkl
 final_project/my_feature_list.pkl
-final_project/*.jpg
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
