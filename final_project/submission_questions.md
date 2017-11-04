@@ -58,13 +58,13 @@ All other entries were left as is.
    rubric items: “create new features”, “intelligently select features”,
    “properly scale features”]
 
-After cleaning up the financial features attention were given to the email
+After cleaning up the financial features attention was given to the email
 features for the next step. The email data was spotty and we are unable to
 discern if the emails included are exhaustive or not. To mitigate the effects
 of possible selection bias due to shifting sample sizes the five existing email
 features were combined into three ratios based on the amount of emails sent
 to/from each person respectively. My hope is that doing this will help avoid
-over fitting our model by reducing noise solely from the sampling method and we
+overfitting our model by reducing noise solely from the sampling method and we
 will revisit this decision once more towards the end of the analysis to see if
 my hypothesis is correct or not. The ratios were calculated as seen here below.
 
@@ -83,12 +83,12 @@ data_df["shared_with_poi_ratio"] = (data_df["shared_receipt_with_poi"]
 
 After the initial clean up described above were finished a descriptive data
 analysis were performed. We found that from a total of 145 data points 127 were
-labeled non-POIs and 18 labeled as POIs. In total we have 15 features at the
-moment not including the given email features since we will switch out these for
-our new email ratio features instead. The new made email features consists of
+labeled non-POIs and 18 labeled as POIs. In total, we have 15 features at the
+moment, not including the given email features since we will switch out these for
+our new email ratio features instead. The newly made email features consists of
 86 data points all of them spanning between 0 and 1 since we created them as
-ratios. The most heterogeneous features comes from the financial data features
-which ranges from just 16 up to 109 data points depending on which features we
+ratios. The most heterogeneous features come from the financial data features
+which range from just 16 up to 109 data points depending on which features we
 are looking at. However, the financial features differ from our email features
 since non-existing values simply are non-existent (zero) while for the email
 features we are unable to tell if no data really means no occurrences or if it
@@ -129,7 +129,7 @@ Potential parameter Values chosen for SelectKBest's k:
 
 Reflecting on the models for supervised learning being presented in the intro to
 machine learning lesson material I wanted to choose a model that is as simple as
-possible so that I still am able to made informed decisions when advancing into
+possible so that I still am able to make informed decisions when advancing into
 the parameter tuning stage. This might say more about my current experience with
 machine learning rather than the data itself but are nonetheless a valid point
 to make.  This assumption gave me three candidates presented early in the
@@ -139,17 +139,17 @@ to pure guessing. This left the SVM and Decision Tree models as valid selections
 for the next step.
 
 One SVM and one Decision Tree classifier where compared and the Decision Tree
-were chosen based on better performance in respect to it's F1 value. The reason
+were chosen based on better performance in respect to its F1 value. The reason
 for choosing the F1 value as a key indicator rather than accuracy is due to the
 unbalanced nature of the POI label. There are only 18 POIs and 127 non-POIs in
-our data set which means that we able to get rather high accuracy (88%) just by
+our data set which means that we able to get a rather high accuracy (88%) just by
 guessing non-POI for everything which isn't very helpful since our goal is to
-classify potential POIs. Further, when comparing the models one extra step were
+classify potential POIs. Further, when comparing the models one extra step was
 added to the SVM pipeline to standardize the input values since the SVM model
 expects standardized features while the Decision Tree works better with
 non-standardized features.
 
-In the end a RandomForest model were chosen to mitigate the risk of over fitting
+In the end, a RandomForest model was chosen to mitigate the risk of overfitting
 our model and to increase the performance on our testing data set.
 
 4. What does it mean to tune the parameters of an algorithm, and what can happen
@@ -164,11 +164,11 @@ our model and to increase the performance on our testing data set.
 Parameter tuning is the process of finding the optimal or good enough values for
 the input parameters the chosen model needs, excluding the target data set's
 features and labels. The method I used to initially tune the parameters for the
-SVM and Decision Tree models is called GridSearchCV and is provided in the
+SVM and Decision Tree models are called GridSearchCV and are provided in the
 sklearn library. GridSearchCV performs an exhaustive search over all
 combinations of the provided candidate parameter inputted and evaluates them
-using a specified measure, in this case the F1-value. The candidate values
-chosen and performance for the models can be seen here below.
+using a specified measure, in this case, the F1-value. The candidate values
+that were chosen and performance for the models can be seen here below.
 
 ```python
 # Candidate parameters for the SVC(SVM) model used in GridSearchCV.
@@ -241,10 +241,15 @@ True positives:     1246        False positives:    2893
 False negatives:    754         True negatives:     10107
 ```
 
-Given the above candidate hyper parameters the Decision Tree model came out as a
-winner. However, since using this model just like this is prone to over fitting
+Given the above candidate hyperparameters, the Decision Tree model came out as a
+winner. To validate our earlier hypothesis that our newly created ratios for the 
+email features help improve predictions the Decision Tree model was fitted a 
+second time over with an alternative feature set containing the original email data.
+As we can see switching out the original email features in favor for the new ratios
+increases our performance so we can use our own created features with confidence.
+However, since using this model just like this is prone to overfitting
 and not very common in the real world (or so I have heard) we didn't stop here.
-Instead we took our modelling one step further and used the tuned Decision Tree
+Instead, we took our modeling one step further and used the tuned Decision Tree
 hyperparameters as input for a Random Forest classifier which creates multiple
 trees from subsets of our data to make many weak predictions that we then can
 combine using majority voting to increase the stability of our model. Tuning
@@ -267,21 +272,24 @@ forest_param_grid = {"feature_selection__k": [7],
    wrong? How did you validate your analysis?  [relevant rubric items: “discuss
    validation”, “validation strategy”]
 
-In machine learning validation means to check your models general performance 
-in contrast to it's performance on the data used to fit the model initially.
-This is to simulate how the model would perform using new and unseen data and an
-invaluable tool for avoiding over fitting your model to noise only existing in
-the data used initially.
+In machine learning validation means to check your model's general performance 
+in contrast to its performance on the data used to fit the model initially.
+This is to simulate how the model would perform using new and unseen data and is an
+invaluable tool for avoiding overfitting your model to noise only existing in
+the data used initially. Ideally, this means that we split up the data in three sets
+one training set, one test set, and one validation set. Also, since the way the data
+is split might affect how the outcome of the valuation repeating this the evaluation
+over many different splits is also desirable.
 
-In order to do this practically we need to split up our data into different
-sets, one used for training, one used for testing, and one for validation. Since
+This time in order to do this in practise we need to split up our data into different
+sets, one used for training, one used for testing, and one for validation. But, since
 our data set is rather small we will use our test set for both testing and
-validation, and as mentiond earlier are labels are unbalanced
+validation, and as mentioned earlier are labels are unbalanced
 StratifiedShuffleSplit (also used in the provided tester.py) from sklearn where
 used to split up our data set into testing and training sets while trying to
 keep the ratio of POIs and non-POIs from the initial data. To make our
 validation more robust we split the data multiple times creating 1000 different
-pairs of training and testing data before performing crossvalidation and
+pairs of training and testing data before performing cross-validation and
 calculating our performance metrics as means for all 1000 different variations.
 
 6. Give at least 2 evaluation metrics and your average performance for each of
@@ -319,7 +327,7 @@ False negatives:    1010    True negatives:     11563
 ```
 
 Focusing on the Precision and Recall values we can see that 40% of our model's
-predicted POIs are correct(Precision) while 49% of the POIs existing
-in the data set where found successfully(Recall). Lastly, just as a final check
+predicted POIs are correct (Precision) while 49% of the POIs existing
+in the dataset was found successfully (Recall). Lastly, just as a final check
 of our reasoning during the feature selection step we try running the model once
 more but with the original email features as input instead. 
