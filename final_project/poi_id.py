@@ -358,7 +358,7 @@ test_classifier(alt_tree.best_estimator_, my_dataset, alt_features_list)
 # CONCLUSION!!! #
 
 
-# Using the DecisionTree algorithm for classification seems promising. But I
+# Using the Decision Tree algorithm for classification seems promising. But I
 # suspect we still can get better results. To do this let's try Random Forest
 # algorithm instead where we generate multiple trees and combine their results
 # in order to classify a data point. This could even out some of the issues
@@ -366,7 +366,7 @@ test_classifier(alt_tree.best_estimator_, my_dataset, alt_features_list)
 # same parameters as our best tree and only change the number of trees
 # generated.
 
-# Pipeline for a RandomForest classifier
+# Pipeline for a Random Forest classifier
 forest = Pipeline([
     ("feature_selection", SelectKBest()),
     ("classification", RandomForestClassifier(class_weight="balanced",
@@ -384,9 +384,9 @@ forest = GridSearchCV(estimator=forest,
 
 forest = forest.fit(features_train, labels_train)
 print "---"
-print "# Decision Tree performance for best parameter set:"
+print "# Random Forest performance for best parameter set:"
 test_classifier(forest.best_estimator_, my_dataset, features_list)
-print "Chosen features for the best estimator: "
+print "Chosen features for the estimator: "
 selected_features = \
         forest.best_estimator_.named_steps["feature_selection"].get_support(
             indices=True
