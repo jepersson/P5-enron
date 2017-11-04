@@ -93,19 +93,20 @@ data_df[financial_data_cols].plot(kind="box",
                                   figsize=(16, 9),
                                   ax=ax)
 ax.set_title("Financial data by features")
+ax.set_xlabel("Amount in dollars")
 plt.savefig("financial_data_boxplot.jpg")
-print("---")
-print("Output financial data box plot to financial_data_boxplot.jpg")
+print "---"  # noqa
+print "Output financial data box plot to financial_data_boxplot.jpg"
 
 # There are some data points standing out with a value much higher than the
 # other values in their category. Printing out salary as an example.
-print("---")
-print("Outlier in financial data found: ")
-print(data_df.loc[data_df["salary"].idxmax()])
+print "---"
+print "Outlier in financial data found: "
+print data_df.loc[data_df["salary"].idxmax()]
 
 # After looking at the print out we can see that the index is TOTAL.
 # Dropping this row since this obviously isn't a person of interest.
-print("TOTAL rows for financial data will be dropped.")
+print "TOTAL rows for financial data will be dropped."
 data_df = data_df.drop("TOTAL")
 
 # Plotting the email data
@@ -115,9 +116,10 @@ data_df[email_data_cols].plot(kind="box",
                               figsize=(16, 9),
                               ax=ax)
 ax.set_title("Email data by features")
+ax.set_xlabel("Number of emails")
 plt.savefig("email_data_boxplot.jpg")
-print("---")
-print("Output email data box plot to email_data_boxplot.jpg")
+print "---"
+print "Output email data box plot to email_data_boxplot.jpg"
 # As seen in the plot and given the same procedure as from the financial data
 # there are some data points that sticks out as having remarkably high counts
 # but after further inspection they seem valid.
@@ -141,9 +143,9 @@ data_df["shared_with_poi_ratio"] = (data_df["shared_receipt_with_poi"]
 
 # Preparation 2: Descriptive statistics and final feature evaluation
 
-print("---")
-print("Printing descriptive statistics for the POI label:")
-print(data_df["poi"].describe())
+print "---"
+print "Printing descriptive statistics for the POI label:"
+print data_df["poi"].describe()
 # We can see here that we have a total of 145 data points, 127 labeled as
 # non-POI and only 18 POIs which accounts for only 12%. Many algorithms expect
 # a lot more balanced ratio between classes in this type of classification
@@ -154,16 +156,16 @@ print(data_df["poi"].describe())
 # will use the F score together with recall and precision while evaluating our
 # algorithms rather than just accuracy.
 
-print("---")
-print("Printing descriptive statistics for the email ratio features:")
-print(data_df[email_ratio_cols].describe())
+print "---"
+print "Printing descriptive statistics for the email ratio features:"
+print data_df[email_ratio_cols].describe()
 # For the email data we can see that we have 86 data points, around 60% of the
 # total dataset. Since we recalculated the features to ratios all values are
 # lying in the 0 to 1 interval.
 
-print("---")
-print("Printing descriptive statistics for the financial features:")
-print(data_df[financial_data_cols].describe())
+print "---"
+print "Printing descriptive statistics for the financial features:"
+print data_df[financial_data_cols].describe()
 # The financial data isn't as uniform as either the poi or email ratios with
 # different counts, values spanning both positive and negative numbers, largely
 # different sizes for different features etc.
@@ -190,8 +192,8 @@ for col in email_ratio_cols:
     ax[i].set_yscale("log")
     i = i + 1
 plt.savefig("email_ratio_histogram.jpg")
-print("---")
-print("Output email ratio histogram to email_ratio__histogram.jpg")
+print "---"
+print "Output email ratio histogram to email_ratio__histogram.jpg"
 
 # And now for our financial data:
 financials_df = data_df.pivot(index=data_df.index.values,
@@ -208,8 +210,8 @@ for col in financial_data_cols:
     ax[i / 6][i % 6].set_yscale("log")
     i = i + 1
 plt.savefig("financial_data_histogram.jpg")
-print("---")
-print("Output financial data histogram to financial_data_histogram.jpg")
+print "---"
+print "Output financial data histogram to financial_data_histogram.jpg"
 
 # Financial features seems to skew slightly towards higher values for POIs
 # compared to non POIs. For the email ratios there are no common trend but all
@@ -230,9 +232,9 @@ best_features = k_best.fit(X=data_df[feature_cols].fillna(0),
                            y=data_df["poi"].fillna(0))
 feature_scores = pd.Series(data=best_features.scores_,
                            index=feature_cols)
-print("---")
-print("F-values for each feature:")
-print(feature_scores.sort_values())
+print "---"
+print "F-values for each feature:"
+print feature_scores.sort_values()
 # There are some small gaps in the sorted values of F-scores, we will use each
 # such gap a candidate for a k-value. (e.g. k=[2, 5, 7, 11, 13, 15]
 # restricted_stock_deferred     0.064477
@@ -320,30 +322,47 @@ svc = GridSearchCV(estimator=svc,
                    param_grid=svc_param_grid,
                    scoring="f1",
                    cv=cv)
-t0 = time()
 svc = svc.fit(features_train, labels_train)
-print("---")
-print("F1 score: ", svc.best_score_)
-print("Time to fit: ", round(time()-t0))
+print "---"
+print "# SVM performance for best parameter set"
 test_classifier(svc.best_estimator_, my_dataset, features_list)
 
 tree = GridSearchCV(estimator=tree,
                     param_grid=tree_param_grid,
                     scoring="f1",
                     cv=cv)
-t0 = time()
 tree = tree.fit(features_train, labels_train)
-print("---")
-print("F1 score: ", tree.best_score_)
-print("Time to fit: ", round(time()-t0))
+print "---"
+print "# Decision Tree performance for best parameter set"
 test_classifier(tree.best_estimator_, my_dataset, features_list)
+
+# As mentioned in the beginning let's go back and test our hypothesis regarding
+# that the newly created email ratios we created gives better performance than
+# the originally provided email features by running the Decision Tree
+# classifier one more time but with the alternative feature set.
+# Extract features and labels from dataset for local testing
+alt_features_list = [x for x in features_list if x not in email_ratio_cols]
+alt_features_list.extend(email_data_cols)
+alt_data = featureFormat(my_dataset, alt_features_list, sort_keys=True)
+alt_labels, alt_features = targetFeatureSplit(alt_data)
+alt_features_train, alt_features_test, alt_labels_train, alt_labels_test = \
+    train_test_split(alt_features, alt_labels, test_size=0.3, random_state=42)
+
+alt_tree = tree.fit(alt_features_train, alt_labels_train)
+print "---"
+print """
+# Decision Tree performance for best parameter set with alternative features.
+"""
+test_classifier(alt_tree.best_estimator_, my_dataset, alt_features_list)
+
+# CONCLUSION!!! #
 
 
 # Using the DecisionTree algorithm for classification seems promising. But I
 # suspect we still can get better results. To do this let's try Random Forest
 # algorithm instead where we generate multiple trees and combine their results
 # in order to classify a data point. This could even out some of the issues
-# that might be due to overfitting to our training data set. we will use the
+# that might be due to overfitting to our training data set. We will use the
 # same parameters as our best tree and only change the number of trees
 # generated.
 
@@ -362,15 +381,17 @@ forest = GridSearchCV(estimator=forest,
                       param_grid=forest_param_grid,
                       scoring="f1",
                       cv=cv)
-t0 = time()
+
 forest = forest.fit(features_train, labels_train)
-print("---")
-print("F1 score: ", forest.best_score_)
-print("Time to fit: ", round(time()-t0))
+print "---"
+print "# Decision Tree performance for best parameter set:"
 test_classifier(forest.best_estimator_, my_dataset, features_list)
-print("Chosen features for the best estimator: ")
-selected_features = forest.best_estimator_.named_steps["feature_selection"].get_support(indices=True)  # noqa
-print([features_list[x] for x in selected_features])
+print "Chosen features for the best estimator: "
+selected_features = \
+        forest.best_estimator_.named_steps["feature_selection"].get_support(
+            indices=True
+        )
+print ", ".join([features_list[x] for x in selected_features])
 
 # Plot scores for each estimator value.
 estimators = [x[0]["classification__n_estimators"]
@@ -379,9 +400,11 @@ scores = [x[1] for x in forest.grid_scores_]
 fig, ax = plt.subplots()
 ax.plot(estimators, scores)
 ax.set_title("F1-score vs number of estimators in Random Forest Model")
+ax.set_xlabel("F1-Score")
+ax.set_ylabel("Number of estimators")
 plt.savefig("f1_vs_estimators.jpg")
-print("---")
-print("Output F1-score vs estimators plot to f1_vs_estimators.jpg")
+print "---"
+print "Output F1-score vs estimators plot to f1_vs_estimators.jpg"
 # We can see that the starts to overfit and get worse results for values of
 # n_estimators after 100 so we set the parameter to 100.
 
@@ -395,7 +418,6 @@ clf = Pipeline([
                                               class_weight="balanced",
                                               random_state=42))
 ])
-
 
 # Task 6: Dump your classifier, dataset, and features_list so anyone can
 # check your results. You do not need to change anything below, but make sure
