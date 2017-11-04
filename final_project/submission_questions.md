@@ -32,15 +32,16 @@ available during the Enron trial. The original data is consisting of a
 collection of internal emails connected to the persons being on trial. The
 version of the data set used in this project has been enhanced with financial
 data also made available at the time. The target variable POI is a boolean where
-people who evidently had connection to the fraud which led to Enron's downfall
-(e.g. persons found guilty, settled, or witnessing in exchange for immunity).
+people who evidently had a connection with the fraud which led to Enron's downfall
+(e.g. a person found guilty, that settled, or witnessed in exchange for immunity) are
+flagged.
 
 Initially looking at the provided feature I made the decision to omit the email
-feature right away since the email address most likely do not have any
+feature right away since the email address most likely does not have any
 connection to the probability of someone being a POI or not. The totals
-(total_stock_value and total_payments) from the financial data where also
+(total_stock_value and total_payments) from the financial data were also
 omitted since this information is redundant and possible to infer from the other
-financial features. After some further investigation a row inside the data set
+financial features. After some further investigation, a row of the dataset
 containing totals (TOTAL) was also found and dropped from the financial data.
 All other entries were left as is.  
 
@@ -272,15 +273,16 @@ This is to simulate how the model would perform using new and unseen data and an
 invaluable tool for avoiding over fitting your model to noise only existing in
 the data used initially.
 
-In order to do this practically we need to split up our data in two sets, one
-used for training and one used for testing. Since our data set is rather small
-and as mentiond earlier are labels are unbalanced StratifiedShuffleSplit (also
-used in the provided tester.py) from sklearn where used to split up our data set
-into testing and training sets while trying to keep the ratio of POIs and
-non-POIs from the initial data. To make our validation more robust we split the
-data multiple times creating 1000 different pairs of training and testing data
-before performing crossvalidation and calculating our performance metrics as
-means for all 1000 different variations.
+In order to do this practically we need to split up our data into different
+sets, one used for training, one used for testing, and one for validation. Since
+our data set is rather small we will use our test set for both testing and
+validation, and as mentiond earlier are labels are unbalanced
+StratifiedShuffleSplit (also used in the provided tester.py) from sklearn where
+used to split up our data set into testing and training sets while trying to
+keep the ratio of POIs and non-POIs from the initial data. To make our
+validation more robust we split the data multiple times creating 1000 different
+pairs of training and testing data before performing crossvalidation and
+calculating our performance metrics as means for all 1000 different variations.
 
 6. Give at least 2 evaluation metrics and your average performance for each of
    them.  Explain an interpretation of your metrics that says something
@@ -318,4 +320,6 @@ False negatives:    1010    True negatives:     11563
 
 Focusing on the Precision and Recall values we can see that 40% of our model's
 predicted POIs are correct(Precision) while 49% of the POIs existing
-in the data set where found successfully(Recall).
+in the data set where found successfully(Recall). Lastly, just as a final check
+of our reasoning during the feature selection step we try running the model once
+more but with the original email features as input instead. 
