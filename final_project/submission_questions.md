@@ -239,6 +239,33 @@ F1:         0.40593     F2:     0.51322
 Total predictions:  15000
 True positives:     1246        False positives:    2893	
 False negatives:    754         True negatives:     10107
+
+# Decision Tree performance for best parameter set with alternative features.
+Pipeline(memory=None,
+         steps=[('feature_selection', SelectKBest(k=15, 
+                                                  score_func=<function f_classif at 0x10a528c08>)), 
+                ('classification', DecisionTreeClassifier(class_weight='balanced', 
+                                                          criterion='gini',
+                                                          max_depth=None,
+                                                          max_features=None,
+                                                          max_leaf_nodes=None,
+                                                          min_impurity_decrease=0.0,
+                                                          min_impurity_split=None,
+                                                          min_samples_leaf=1,
+                                                          min_samples_split=11,
+                                                          min_weight_fraction_leaf=0.0,
+                                                          presort=False,
+                                                          random_state=42,
+                                                          splitter='best'))])
+
+Accuracy:       0.76193
+Precision:      0.23127     Recall:     0.33800 
+F1:             0.27463     F2:         0.30944
+
+Total predictions:  15000
+True positives:     676     False positives:    2247
+False negatives:    1324    True negatives:     10753
+
 ```
 
 Given the above candidate hyperparameters, the Decision Tree model came out as a
