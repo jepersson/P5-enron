@@ -106,10 +106,9 @@ bonus                        21.327890
 exercised_stock_options      25.380105
 dtype: float64
 ---
-('F1 score: ', 0.34623968253968235)
-('Time to fit: ', 984.0)
+# SVM performance for best parameter set
 Pipeline(memory=None,
-     steps=[('feature_scaling', StandardScaler(copy=True, with_mean=True, with_std=True)), ('feature_selection', SelectKBest(k=11, score_func=<function f_classif at 0x107cb4b90>)), ('classification', SVC(C=1, cache_size=200, class_weight='balanced', coef0=0.0,
+     steps=[('feature_scaling', StandardScaler(copy=True, with_mean=True, with_std=True)), ('feature_selection', SelectKBest(k=11, score_func=<function f_classif at 0x10a528c08>)), ('classification', SVC(C=1, cache_size=200, class_weight='balanced', coef0=0.0,
   decision_function_shape='ovr', degree=3, gamma=0.01, kernel='rbf',
   max_iter=-1, probability=False, random_state=42, shrinking=True,
   tol=0.001, verbose=False))])
@@ -117,10 +116,9 @@ Pipeline(memory=None,
 	Total predictions: 15000	True positives: 1307	False positives: 3956	False negatives:  693	True negatives: 9044
 
 ---
-('F1 score: ', 0.4855912698412697)
-('Time to fit: ', 1953.0)
+# Decision Tree performance for best parameter set
 Pipeline(memory=None,
-     steps=[('feature_selection', SelectKBest(k=7, score_func=<function f_classif at 0x107cb4b90>)), ('classification', DecisionTreeClassifier(class_weight='balanced', criterion='gini',
+     steps=[('feature_selection', SelectKBest(k=7, score_func=<function f_classif at 0x10a528c08>)), ('classification', DecisionTreeClassifier(class_weight='balanced', criterion='gini',
             max_depth=None, max_features=None, max_leaf_nodes=None,
             min_impurity_decrease=0.0, min_impurity_split=None,
             min_samples_leaf=1, min_samples_split=19,
@@ -130,17 +128,29 @@ Pipeline(memory=None,
 	Total predictions: 15000	True positives: 1246	False positives: 2893	False negatives:  754	True negatives: 10107
 
 ---
-('F1 score: ', 0.3459452380952373)
-('Time to fit: ', 1361.0)
+# Decision Tree performance for best parameter set with alternative features.
+
 Pipeline(memory=None,
-     steps=[('feature_selection', SelectKBest(k=7, score_func=<function f_classif at 0x107cb4b90>)), ('classification', RandomForestClassifier(bootstrap=True, class_weight='balanced',
+     steps=[('feature_selection', SelectKBest(k=15, score_func=<function f_classif at 0x10a528c08>)), ('classification', DecisionTreeClassifier(class_weight='balanced', criterion='gini',
+            max_depth=None, max_features=None, max_leaf_nodes=None,
+            min_impurity_decrease=0.0, min_impurity_split=None,
+            min_samples_leaf=1, min_samples_split=11,
+            min_weight_fraction_leaf=0.0, presort=False, random_state=42,
+            splitter='best'))])
+	Accuracy: 0.76193	Precision: 0.23127	Recall: 0.33800	F1: 0.27463	F2: 0.30944
+	Total predictions: 15000	True positives:  676	False positives: 2247	False negatives: 1324	True negatives: 10753
+
+---
+# Random Forest performance for best parameter set:
+Pipeline(memory=None,
+     steps=[('feature_selection', SelectKBest(k=7, score_func=<function f_classif at 0x10a528c08>)), ('classification', RandomForestClassifier(bootstrap=True, class_weight='balanced',
             criterion='gini', max_depth=None, max_features='auto',
             max_leaf_nodes=None, min_impurity_decrease...timators=100, n_jobs=1, oob_score=False, random_state=42,
             verbose=0, warm_start=False))])
 	Accuracy: 0.83687	Precision: 0.40791	Recall: 0.49500	F1: 0.44726	F2: 0.47473
 	Total predictions: 15000	True positives:  990	False positives: 1437	False negatives: 1010	True negatives: 11563
 
-Chosen features for the best estimator: 
-['expenses', 'loan_advances', 'restricted_stock', 'deferred_income', 'to_poi_ratio', 'salary', 'bonus']
+Chosen features for the estimator: 
+expenses, loan_advances, restricted_stock, deferred_income, to_poi_ratio, salary, bonus
 ---
 Output F1-score vs estimators plot to f1_vs_estimators.jpg

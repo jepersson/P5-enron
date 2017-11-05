@@ -354,9 +354,8 @@ print """
 # Decision Tree performance for best parameter set with alternative features.
 """
 test_classifier(alt_tree.best_estimator_, my_dataset, alt_features_list)
-
-# CONCLUSION!!! #
-
+# As we can see from the above code's print out we get a higher F1 score from
+# using our ratios. We will continue forward using them as input for our model.
 
 # Using the Decision Tree algorithm for classification seems promising. But I
 # suspect we still can get better results. To do this let's try Random Forest
