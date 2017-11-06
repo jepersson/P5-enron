@@ -109,6 +109,17 @@ print data_df.loc[data_df["salary"].idxmax()]
 print "TOTAL rows for financial data will be dropped."
 data_df = data_df.drop("TOTAL")
 
+# While checking the pdf file with the table containing the original data I also
+# spotted another entry that was out of place. Since most indexes are on the
+# form <Last Name> <First Name> or <Last Name> <First Name> <Initial> lets have
+# a closer look at indexes having less than two or more than three words in
+# them.
+print "Indexes with less than two or more than three words: "
+print [x for x in data_df.index if len(x.split(" ")) > 3]
+print "THE TRAVEL AGENCY IN THE PARK outlier found."
+print "THE TRAVEL AGENCY IN THE PARK row will be dropped."
+data_df = data_df.drop("THE TRAVEL AGENCY IN THE PARK")
+
 # Plotting the email data
 fig, ax = plt.subplots()
 data_df[email_data_cols].plot(kind="box",
@@ -179,7 +190,6 @@ email_df = data_df.pivot(index=data_df.index.values,
                          columns="poi")[email_ratio_cols]
 # Getting the figure and axes
 fig, ax = plt.subplots(nrows=1, ncols=3, sharey=True)
-fig.suptitle("Email Ratio Histograms", fontsize=18)
 # Loop through the columns we want to plot and add their subplots
 i = 0
 for col in email_ratio_cols:
@@ -199,7 +209,7 @@ print "Output email ratio histogram to email_ratio__histogram.jpg"
 financials_df = data_df.pivot(index=data_df.index.values,
                               columns="poi")[financial_data_cols]
 fig, ax = plt.subplots(nrows=2, ncols=6, sharey=True)
-fig.suptitle("Financial Data Histograms", fontsize=18)
+fig.tight_layout()
 i = 0
 for col in financial_data_cols:
     financials_df[col].plot(kind="hist",
@@ -208,6 +218,7 @@ for col in financial_data_cols:
                             figsize=(16, 7),
                             ax=ax[i / 6][i % 6])
     ax[i / 6][i % 6].set_yscale("log")
+    ax[i / 6][i % 6].get_xaxis().get_major_formatter().set_powerlimits((-3, 4))
     i = i + 1
 plt.savefig("financial_data_histogram.jpg")
 print "---"

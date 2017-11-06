@@ -22,14 +22,18 @@ shared_receipt_with_poi              NaN
 to_messages                          NaN
 Name: TOTAL, dtype: object
 TOTAL rows for financial data will be dropped.
+Indexes with less than two or more than three words: 
+['BLAKE JR. NORMAN P', 'BOWEN JR RAYMOND M', 'DERRICK JR. JAMES V', 'DONAHUE JR JEFFREY M', 'GLISAN JR BEN F', 'OVERDYKE JR JERE C', 'PEREIRA PAULO V. FERRAZ', 'THE TRAVEL AGENCY IN THE PARK', 'WALLS JR ROBERT H', 'WHITE JR THOMAS E', 'WINOKUR JR. HERBERT S']
+THE TRAVEL AGENCY IN THE PARK outlier found.
+THE TRAVEL AGENCY IN THE PARK row will be dropped.
 ---
 Output email data box plot to email_data_boxplot.jpg
 ---
 Printing descriptive statistics for the POI label:
-count       145
+count       144
 unique        2
 top       False
-freq        127
+freq        126
 Name: poi, dtype: object
 ---
 Printing descriptive statistics for the email ratio features:
@@ -65,13 +69,13 @@ min                -1.787380e+06    -3.504386e+06     148.000000
 max                 1.545629e+07    -8.330000e+02  228763.000000   
 
        exercised_stock_options         other  long_term_incentive  \
-count             1.010000e+02  9.200000e+01         6.500000e+01   
-mean              2.959559e+06  4.652767e+05         7.464912e+05   
-std               5.499450e+06  1.389719e+06         8.629174e+05   
+count             1.010000e+02  9.100000e+01         6.500000e+01   
+mean              2.959559e+06  4.664105e+05         7.464912e+05   
+std               5.499450e+06  1.397376e+06         8.629174e+05   
 min               3.285000e+03  2.000000e+00         6.922300e+04   
-25%               5.067650e+05  1.209000e+03         2.750000e+05   
-50%               1.297049e+06  5.198450e+04         4.221580e+05   
-75%               2.542813e+06  3.575772e+05         8.318090e+05   
+25%               5.067650e+05  1.203000e+03         2.750000e+05   
+50%               1.297049e+06  5.158700e+04         4.221580e+05   
+75%               2.542813e+06  3.319830e+05         8.318090e+05   
 max               3.434838e+07  1.035973e+07         5.145434e+06   
 
        restricted_stock  director_fees  
@@ -89,68 +93,162 @@ Output email ratio histogram to email_ratio__histogram.jpg
 Output financial data histogram to financial_data_histogram.jpg
 ---
 F-values for each feature:
-restricted_stock_deferred     0.064477
-deferral_payments             0.209706
-director_fees                 2.089310
-from_poi_ratio                3.293829
-other                         4.263577
-expenses                      6.374614
-loan_advances                 7.301407
-restricted_stock              9.480743
-shared_with_poi_ratio         9.491458
-long_term_incentive          10.222904
-deferred_income              11.732698
-to_poi_ratio                 16.873870
-salary                       18.861795
-bonus                        21.327890
-exercised_stock_options      25.380105
+restricted_stock_deferred     0.064984
+deferral_payments             0.217059
+director_fees                 2.107656
+from_poi_ratio                3.210762
+other                         4.246154
+expenses                      6.234201
+loan_advances                 7.242730
+shared_with_poi_ratio         9.296232
+restricted_stock              9.346701
+long_term_incentive          10.072455
+deferred_income              11.595548
+to_poi_ratio                 16.641707
+salary                       18.575703
+bonus                        21.060002
+exercised_stock_options      25.097542
 dtype: float64
----
-# SVM performance for best parameter set
-Pipeline(memory=None,
-     steps=[('feature_scaling', StandardScaler(copy=True, with_mean=True, with_std=True)), ('feature_selection', SelectKBest(k=11, score_func=<function f_classif at 0x10a528c08>)), ('classification', SVC(C=1, cache_size=200, class_weight='balanced', coef0=0.0,
-  decision_function_shape='ovr', degree=3, gamma=0.01, kernel='rbf',
-  max_iter=-1, probability=False, random_state=42, shrinking=True,
-  tol=0.001, verbose=False))])
-	Accuracy: 0.69007	Precision: 0.24834	Recall: 0.65350	F1: 0.35991	F2: 0.49272
-	Total predictions: 15000	True positives: 1307	False positives: 3956	False negatives:  693	True negatives: 9044
+[0;31m[0m
+[0;31mKeyboardInterrupt[0mTraceback (most recent call last)
+[0;32m/Users/jepersson/Projects/P5-enron/final_project/poi_id.py[0m in [0;36m<module>[0;34m()[0m
+[1;32m    334[0m                    [0mscoring[0m[0;34m=[0m[0;34m"f1"[0m[0;34m,[0m[0;34m[0m[0m
+[1;32m    335[0m                    cv=cv)
+[0;32m--> 336[0;31m [0msvc[0m [0;34m=[0m [0msvc[0m[0;34m.[0m[0mfit[0m[0;34m([0m[0mfeatures_train[0m[0;34m,[0m [0mlabels_train[0m[0;34m)[0m[0;34m[0m[0m
+[0m[1;32m    337[0m [0;32mprint[0m [0;34m"---"[0m[0;34m[0m[0m
+[1;32m    338[0m [0;32mprint[0m [0;34m"# SVM performance for best parameter set"[0m[0;34m[0m[0m
 
----
-# Decision Tree performance for best parameter set
-Pipeline(memory=None,
-     steps=[('feature_selection', SelectKBest(k=7, score_func=<function f_classif at 0x10a528c08>)), ('classification', DecisionTreeClassifier(class_weight='balanced', criterion='gini',
-            max_depth=None, max_features=None, max_leaf_nodes=None,
-            min_impurity_decrease=0.0, min_impurity_split=None,
-            min_samples_leaf=1, min_samples_split=19,
-            min_weight_fraction_leaf=0.0, presort=False, random_state=42,
-            splitter='best'))])
-	Accuracy: 0.75687	Precision: 0.30104	Recall: 0.62300	F1: 0.40593	F2: 0.51322
-	Total predictions: 15000	True positives: 1246	False positives: 2893	False negatives:  754	True negatives: 10107
+[0;32m/Users/jepersson/.ve/P5-enron/lib/python2.7/site-packages/sklearn/grid_search.pyc[0m in [0;36mfit[0;34m(self, X, y)[0m
+[1;32m    836[0m [0;34m[0m[0m
+[1;32m    837[0m         """
+[0;32m--> 838[0;31m         [0;32mreturn[0m [0mself[0m[0;34m.[0m[0m_fit[0m[0;34m([0m[0mX[0m[0;34m,[0m [0my[0m[0;34m,[0m [0mParameterGrid[0m[0;34m([0m[0mself[0m[0;34m.[0m[0mparam_grid[0m[0;34m)[0m[0;34m)[0m[0;34m[0m[0m
+[0m[1;32m    839[0m [0;34m[0m[0m
+[1;32m    840[0m [0;34m[0m[0m
 
----
-# Decision Tree performance for best parameter set with alternative features.
+[0;32m/Users/jepersson/.ve/P5-enron/lib/python2.7/site-packages/sklearn/grid_search.pyc[0m in [0;36m_fit[0;34m(self, X, y, parameter_iterable)[0m
+[1;32m    572[0m                                     [0mself[0m[0;34m.[0m[0mfit_params[0m[0;34m,[0m [0mreturn_parameters[0m[0;34m=[0m[0mTrue[0m[0;34m,[0m[0;34m[0m[0m
+[1;32m    573[0m                                     error_score=self.error_score)
+[0;32m--> 574[0;31m                 [0;32mfor[0m [0mparameters[0m [0;32min[0m [0mparameter_iterable[0m[0;34m[0m[0m
+[0m[1;32m    575[0m                 for train, test in cv)
+[1;32m    576[0m [0;34m[0m[0m
 
-Pipeline(memory=None,
-     steps=[('feature_selection', SelectKBest(k=15, score_func=<function f_classif at 0x10a528c08>)), ('classification', DecisionTreeClassifier(class_weight='balanced', criterion='gini',
-            max_depth=None, max_features=None, max_leaf_nodes=None,
-            min_impurity_decrease=0.0, min_impurity_split=None,
-            min_samples_leaf=1, min_samples_split=11,
-            min_weight_fraction_leaf=0.0, presort=False, random_state=42,
-            splitter='best'))])
-	Accuracy: 0.76193	Precision: 0.23127	Recall: 0.33800	F1: 0.27463	F2: 0.30944
-	Total predictions: 15000	True positives:  676	False positives: 2247	False negatives: 1324	True negatives: 10753
+[0;32m/Users/jepersson/.ve/P5-enron/lib/python2.7/site-packages/sklearn/externals/joblib/parallel.pyc[0m in [0;36m__call__[0;34m(self, iterable)[0m
+[1;32m    777[0m             [0;31m# was dispatched. In particular this covers the edge[0m[0;34m[0m[0;34m[0m[0m
+[1;32m    778[0m             [0;31m# case of Parallel used with an exhausted iterator.[0m[0;34m[0m[0;34m[0m[0m
+[0;32m--> 779[0;31m             [0;32mwhile[0m [0mself[0m[0;34m.[0m[0mdispatch_one_batch[0m[0;34m([0m[0miterator[0m[0;34m)[0m[0;34m:[0m[0;34m[0m[0m
+[0m[1;32m    780[0m                 [0mself[0m[0;34m.[0m[0m_iterating[0m [0;34m=[0m [0mTrue[0m[0;34m[0m[0m
+[1;32m    781[0m             [0;32melse[0m[0;34m:[0m[0;34m[0m[0m
 
----
-# Random Forest performance for best parameter set:
-Pipeline(memory=None,
-     steps=[('feature_selection', SelectKBest(k=7, score_func=<function f_classif at 0x10a528c08>)), ('classification', RandomForestClassifier(bootstrap=True, class_weight='balanced',
-            criterion='gini', max_depth=None, max_features='auto',
-            max_leaf_nodes=None, min_impurity_decrease...timators=100, n_jobs=1, oob_score=False, random_state=42,
-            verbose=0, warm_start=False))])
-	Accuracy: 0.83687	Precision: 0.40791	Recall: 0.49500	F1: 0.44726	F2: 0.47473
-	Total predictions: 15000	True positives:  990	False positives: 1437	False negatives: 1010	True negatives: 11563
+[0;32m/Users/jepersson/.ve/P5-enron/lib/python2.7/site-packages/sklearn/externals/joblib/parallel.pyc[0m in [0;36mdispatch_one_batch[0;34m(self, iterator)[0m
+[1;32m    623[0m                 [0;32mreturn[0m [0mFalse[0m[0;34m[0m[0m
+[1;32m    624[0m             [0;32melse[0m[0;34m:[0m[0;34m[0m[0m
+[0;32m--> 625[0;31m                 [0mself[0m[0;34m.[0m[0m_dispatch[0m[0;34m([0m[0mtasks[0m[0;34m)[0m[0;34m[0m[0m
+[0m[1;32m    626[0m                 [0;32mreturn[0m [0mTrue[0m[0;34m[0m[0m
+[1;32m    627[0m [0;34m[0m[0m
 
-Chosen features for the estimator: 
-expenses, loan_advances, restricted_stock, deferred_income, to_poi_ratio, salary, bonus
----
-Output F1-score vs estimators plot to f1_vs_estimators.jpg
+[0;32m/Users/jepersson/.ve/P5-enron/lib/python2.7/site-packages/sklearn/externals/joblib/parallel.pyc[0m in [0;36m_dispatch[0;34m(self, batch)[0m
+[1;32m    586[0m         [0mdispatch_timestamp[0m [0;34m=[0m [0mtime[0m[0;34m.[0m[0mtime[0m[0;34m([0m[0;34m)[0m[0;34m[0m[0m
+[1;32m    587[0m         [0mcb[0m [0;34m=[0m [0mBatchCompletionCallBack[0m[0;34m([0m[0mdispatch_timestamp[0m[0;34m,[0m [0mlen[0m[0;34m([0m[0mbatch[0m[0;34m)[0m[0;34m,[0m [0mself[0m[0;34m)[0m[0;34m[0m[0m
+[0;32m--> 588[0;31m         [0mjob[0m [0;34m=[0m [0mself[0m[0;34m.[0m[0m_backend[0m[0;34m.[0m[0mapply_async[0m[0;34m([0m[0mbatch[0m[0;34m,[0m [0mcallback[0m[0;34m=[0m[0mcb[0m[0;34m)[0m[0;34m[0m[0m
+[0m[1;32m    589[0m         [0mself[0m[0;34m.[0m[0m_jobs[0m[0;34m.[0m[0mappend[0m[0;34m([0m[0mjob[0m[0;34m)[0m[0;34m[0m[0m
+[1;32m    590[0m [0;34m[0m[0m
+
+[0;32m/Users/jepersson/.ve/P5-enron/lib/python2.7/site-packages/sklearn/externals/joblib/_parallel_backends.pyc[0m in [0;36mapply_async[0;34m(self, func, callback)[0m
+[1;32m    109[0m     [0;32mdef[0m [0mapply_async[0m[0;34m([0m[0mself[0m[0;34m,[0m [0mfunc[0m[0;34m,[0m [0mcallback[0m[0;34m=[0m[0mNone[0m[0;34m)[0m[0;34m:[0m[0;34m[0m[0m
+[1;32m    110[0m         [0;34m"""Schedule a func to be run"""[0m[0;34m[0m[0m
+[0;32m--> 111[0;31m         [0mresult[0m [0;34m=[0m [0mImmediateResult[0m[0;34m([0m[0mfunc[0m[0;34m)[0m[0;34m[0m[0m
+[0m[1;32m    112[0m         [0;32mif[0m [0mcallback[0m[0;34m:[0m[0;34m[0m[0m
+[1;32m    113[0m             [0mcallback[0m[0;34m([0m[0mresult[0m[0;34m)[0m[0;34m[0m[0m
+
+[0;32m/Users/jepersson/.ve/P5-enron/lib/python2.7/site-packages/sklearn/externals/joblib/_parallel_backends.pyc[0m in [0;36m__init__[0;34m(self, batch)[0m
+[1;32m    330[0m         [0;31m# Don't delay the application, to avoid keeping the input[0m[0;34m[0m[0;34m[0m[0m
+[1;32m    331[0m         [0;31m# arguments in memory[0m[0;34m[0m[0;34m[0m[0m
+[0;32m--> 332[0;31m         [0mself[0m[0;34m.[0m[0mresults[0m [0;34m=[0m [0mbatch[0m[0;34m([0m[0;34m)[0m[0;34m[0m[0m
+[0m[1;32m    333[0m [0;34m[0m[0m
+[1;32m    334[0m     [0;32mdef[0m [0mget[0m[0;34m([0m[0mself[0m[0;34m)[0m[0;34m:[0m[0;34m[0m[0m
+
+[0;32m/Users/jepersson/.ve/P5-enron/lib/python2.7/site-packages/sklearn/externals/joblib/parallel.pyc[0m in [0;36m__call__[0;34m(self)[0m
+[1;32m    129[0m [0;34m[0m[0m
+[1;32m    130[0m     [0;32mdef[0m [0m__call__[0m[0;34m([0m[0mself[0m[0;34m)[0m[0;34m:[0m[0;34m[0m[0m
+[0;32m--> 131[0;31m         [0;32mreturn[0m [0;34m[[0m[0mfunc[0m[0;34m([0m[0;34m*[0m[0margs[0m[0;34m,[0m [0;34m**[0m[0mkwargs[0m[0;34m)[0m [0;32mfor[0m [0mfunc[0m[0;34m,[0m [0margs[0m[0;34m,[0m [0mkwargs[0m [0;32min[0m [0mself[0m[0;34m.[0m[0mitems[0m[0;34m][0m[0;34m[0m[0m
+[0m[1;32m    132[0m [0;34m[0m[0m
+[1;32m    133[0m     [0;32mdef[0m [0m__len__[0m[0;34m([0m[0mself[0m[0;34m)[0m[0;34m:[0m[0;34m[0m[0m
+
+[0;32m/Users/jepersson/.ve/P5-enron/lib/python2.7/site-packages/sklearn/cross_validation.pyc[0m in [0;36m_fit_and_score[0;34m(estimator, X, y, scorer, train, test, verbose, parameters, fit_params, return_train_score, return_parameters, error_score)[0m
+[1;32m   1662[0m [0;34m[0m[0m
+[1;32m   1663[0m     [0;32mif[0m [0mparameters[0m [0;32mis[0m [0;32mnot[0m [0mNone[0m[0;34m:[0m[0;34m[0m[0m
+[0;32m-> 1664[0;31m         [0mestimator[0m[0;34m.[0m[0mset_params[0m[0;34m([0m[0;34m**[0m[0mparameters[0m[0;34m)[0m[0;34m[0m[0m
+[0m[1;32m   1665[0m [0;34m[0m[0m
+[1;32m   1666[0m     [0mstart_time[0m [0;34m=[0m [0mtime[0m[0;34m.[0m[0mtime[0m[0;34m([0m[0;34m)[0m[0;34m[0m[0m
+
+[0;32m/Users/jepersson/.ve/P5-enron/lib/python2.7/site-packages/sklearn/pipeline.pyc[0m in [0;36mset_params[0;34m(self, **kwargs)[0m
+[1;32m    142[0m         [0mself[0m[0;34m[0m[0m
+[1;32m    143[0m         """
+[0;32m--> 144[0;31m         [0mself[0m[0;34m.[0m[0m_set_params[0m[0;34m([0m[0;34m'steps'[0m[0;34m,[0m [0;34m**[0m[0mkwargs[0m[0;34m)[0m[0;34m[0m[0m
+[0m[1;32m    145[0m         [0;32mreturn[0m [0mself[0m[0;34m[0m[0m
+[1;32m    146[0m [0;34m[0m[0m
+
+[0;32m/Users/jepersson/.ve/P5-enron/lib/python2.7/site-packages/sklearn/utils/metaestimators.pyc[0m in [0;36m_set_params[0;34m(self, attr, **params)[0m
+[1;32m     47[0m                 [0mself[0m[0;34m.[0m[0m_replace_estimator[0m[0;34m([0m[0mattr[0m[0;34m,[0m [0mname[0m[0;34m,[0m [0mparams[0m[0;34m.[0m[0mpop[0m[0;34m([0m[0mname[0m[0;34m)[0m[0;34m)[0m[0;34m[0m[0m
+[1;32m     48[0m         [0;31m# 3. Step parameters and other initilisation arguments[0m[0;34m[0m[0;34m[0m[0m
+[0;32m---> 49[0;31m         [0msuper[0m[0;34m([0m[0m_BaseComposition[0m[0;34m,[0m [0mself[0m[0;34m)[0m[0;34m.[0m[0mset_params[0m[0;34m([0m[0;34m**[0m[0mparams[0m[0;34m)[0m[0;34m[0m[0m
+[0m[1;32m     50[0m         [0;32mreturn[0m [0mself[0m[0;34m[0m[0m
+[1;32m     51[0m [0;34m[0m[0m
+
+[0;32m/Users/jepersson/.ve/P5-enron/lib/python2.7/site-packages/sklearn/base.pyc[0m in [0;36mset_params[0;34m(self, **params)[0m
+[1;32m    274[0m                                      (name, self))
+[1;32m    275[0m                 [0msub_object[0m [0;34m=[0m [0mvalid_params[0m[0;34m[[0m[0mname[0m[0;34m][0m[0;34m[0m[0m
+[0;32m--> 276[0;31m                 [0msub_object[0m[0;34m.[0m[0mset_params[0m[0;34m([0m[0;34m**[0m[0;34m{[0m[0msub_name[0m[0;34m:[0m [0mvalue[0m[0;34m}[0m[0;34m)[0m[0;34m[0m[0m
+[0m[1;32m    277[0m             [0;32melse[0m[0;34m:[0m[0;34m[0m[0m
+[1;32m    278[0m                 [0;31m# simple objects case[0m[0;34m[0m[0;34m[0m[0m
+
+[0;32m/Users/jepersson/.ve/P5-enron/lib/python2.7/site-packages/sklearn/base.pyc[0m in [0;36mset_params[0;34m(self, **params)[0m
+[1;32m    262[0m             [0;31m# Simple optimization to gain speed (inspect is slow)[0m[0;34m[0m[0;34m[0m[0m
+[1;32m    263[0m             [0;32mreturn[0m [0mself[0m[0;34m[0m[0m
+[0;32m--> 264[0;31m         [0mvalid_params[0m [0;34m=[0m [0mself[0m[0;34m.[0m[0mget_params[0m[0;34m([0m[0mdeep[0m[0;34m=[0m[0mTrue[0m[0;34m)[0m[0;34m[0m[0m
+[0m[1;32m    265[0m         [0;32mfor[0m [0mkey[0m[0;34m,[0m [0mvalue[0m [0;32min[0m [0msix[0m[0;34m.[0m[0miteritems[0m[0;34m([0m[0mparams[0m[0;34m)[0m[0;34m:[0m[0;34m[0m[0m
+[1;32m    266[0m             [0msplit[0m [0;34m=[0m [0mkey[0m[0;34m.[0m[0msplit[0m[0;34m([0m[0;34m'__'[0m[0;34m,[0m [0;36m1[0m[0;34m)[0m[0;34m[0m[0m
+
+[0;32m/Users/jepersson/.ve/P5-enron/lib/python2.7/site-packages/sklearn/base.pyc[0m in [0;36mget_params[0;34m(self, deep)[0m
+[1;32m    225[0m         """
+[1;32m    226[0m         [0mout[0m [0;34m=[0m [0mdict[0m[0;34m([0m[0;34m)[0m[0;34m[0m[0m
+[0;32m--> 227[0;31m         [0;32mfor[0m [0mkey[0m [0;32min[0m [0mself[0m[0;34m.[0m[0m_get_param_names[0m[0;34m([0m[0;34m)[0m[0;34m:[0m[0;34m[0m[0m
+[0m[1;32m    228[0m             [0;31m# We need deprecation warnings to always be on in order to[0m[0;34m[0m[0;34m[0m[0m
+[1;32m    229[0m             [0;31m# catch deprecated param values.[0m[0;34m[0m[0;34m[0m[0m
+
+[0;32m/Users/jepersson/.ve/P5-enron/lib/python2.7/site-packages/sklearn/base.pyc[0m in [0;36m_get_param_names[0;34m(cls)[0m
+[1;32m    195[0m         [0;31m# introspect the constructor arguments to find the model parameters[0m[0;34m[0m[0;34m[0m[0m
+[1;32m    196[0m         [0;31m# to represent[0m[0;34m[0m[0;34m[0m[0m
+[0;32m--> 197[0;31m         [0minit_signature[0m [0;34m=[0m [0msignature[0m[0;34m([0m[0minit[0m[0;34m)[0m[0;34m[0m[0m
+[0m[1;32m    198[0m         [0;31m# Consider the constructor parameters excluding 'self'[0m[0;34m[0m[0;34m[0m[0m
+[1;32m    199[0m         parameters = [p for p in init_signature.parameters.values()
+
+[0;32m/Users/jepersson/.ve/P5-enron/lib/python2.7/site-packages/sklearn/externals/funcsigs.pyc[0m in [0;36msignature[0;34m(obj)[0m
+[1;32m     64[0m                     kind=_POSITIONAL_ONLY)
+[1;32m     65[0m                 return sig.replace(
+[0;32m---> 66[0;31m                     parameters=(first,) + tuple(sig.parameters.values())[1:])
+[0m[1;32m     67[0m             [0;32melse[0m[0;34m:[0m[0;34m[0m[0m
+[1;32m     68[0m                 [0;32mreturn[0m [0msig[0m[0;34m[0m[0m
+
+[0;32m/Users/jepersson/.ve/P5-enron/lib/python2.7/site-packages/sklearn/externals/funcsigs.pyc[0m in [0;36mreplace[0;34m(self, parameters, return_annotation)[0m
+[1;32m    604[0m [0;34m[0m[0m
+[1;32m    605[0m         return type(self)(parameters,
+[0;32m--> 606[0;31m                           return_annotation=return_annotation)
+[0m[1;32m    607[0m [0;34m[0m[0m
+[1;32m    608[0m     [0;32mdef[0m [0m__hash__[0m[0;34m([0m[0mself[0m[0;34m)[0m[0;34m:[0m[0;34m[0m[0m
+
+[0;32m/Users/jepersson/.ve/P5-enron/lib/python2.7/site-packages/sklearn/externals/funcsigs.pyc[0m in [0;36m__init__[0;34m(self, parameters, return_annotation, __validate_parameters__)[0m
+[1;32m    499[0m                         [0mmsg[0m [0;34m=[0m [0;34m'duplicate parameter name: {0!r}'[0m[0;34m.[0m[0mformat[0m[0;34m([0m[0mname[0m[0;34m)[0m[0;34m[0m[0m
+[1;32m    500[0m                         [0;32mraise[0m [0mValueError[0m[0;34m([0m[0mmsg[0m[0;34m)[0m[0;34m[0m[0m
+[0;32m--> 501[0;31m                     [0mparams[0m[0;34m[[0m[0mname[0m[0;34m][0m [0;34m=[0m [0mparam[0m[0;34m[0m[0m
+[0m[1;32m    502[0m             [0;32melse[0m[0;34m:[0m[0;34m[0m[0m
+[1;32m    503[0m                 params = OrderedDict(((param.name, param)
+
+[0;32m/Users/jepersson/.pyenv/versions/2.7.13/lib/python2.7/collections.pyc[0m in [0;36m__setitem__[0;34m(self, key, value, dict_setitem)[0m
+[1;32m     69[0m         [0mself[0m[0;34m.[0m[0m__update[0m[0;34m([0m[0;34m*[0m[0margs[0m[0;34m,[0m [0;34m**[0m[0mkwds[0m[0;34m)[0m[0;34m[0m[0m
+[1;32m     70[0m [0;34m[0m[0m
+[0;32m---> 71[0;31m     [0;32mdef[0m [0m__setitem__[0m[0;34m([0m[0mself[0m[0;34m,[0m [0mkey[0m[0;34m,[0m [0mvalue[0m[0;34m,[0m [0mdict_setitem[0m[0;34m=[0m[0mdict[0m[0;34m.[0m[0m__setitem__[0m[0;34m)[0m[0;34m:[0m[0;34m[0m[0m
+[0m[1;32m     72[0m         [0;34m'od.__setitem__(i, y) <==> od[i]=y'[0m[0;34m[0m[0m
+[1;32m     73[0m         [0;31m# Setting a new item creates a new link at the end of the linked list,[0m[0;34m[0m[0;34m[0m[0m
+
+[0;31mKeyboardInterrupt[0m: 

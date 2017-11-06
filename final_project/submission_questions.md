@@ -355,6 +355,4 @@ False negatives:    1010    True negatives:     11563
 
 Focusing on the Precision and Recall values we can see that 40% of our model's
 predicted POIs are correct (Precision) while 49% of the POIs existing
-in the dataset was found successfully (Recall). Lastly, just as a final check
-of our reasoning during the feature selection step we try running the model once
-more but with the original email features as input instead. 
+in the dataset was found successfully (Recall). 
